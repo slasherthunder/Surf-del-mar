@@ -1,0 +1,112 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Sponsors" description="Thank you to the sponsors of Surf Del Mar and the Del Mar Historical Society Surfing Festival.">
+	<section class="hero sponsors-hero">
+		<div class="hero-content">
+			<span class="eyebrow">Thank You</span>
+			<h1 class="hero-title">Sponsors</h1>
+			<p class="tagline">Supporting Del Mar's surf heritage and the 4-day Surfing Festival.</p>
+		</div>
+	</section>
+
+	<section class="sponsors-content">
+		<div class="container sponsors-inner">
+			<p class="sponsors-intro">
+				The Del Mar Historical Society and Surf Del Mar are grateful to the businesses and organizations that help make our events and preservation work possible. Sponsor information will be listed here as the festival approaches.
+			</p>
+			<div class="sponsors-cta">
+				<p>Interested in becoming a sponsor?</p>
+				<a href="https://delmarhistoricalsociety.org/" target="_blank" rel="noopener noreferrer" class="btn btn-primary">Contact Del Mar Historical Society</a>
+			</div>
+		</div>
+	</section>
+</BaseLayout>
+
+<style>
+	.hero.sponsors-hero {
+		padding: 3rem 2rem;
+		text-align: center;
+		background: linear-gradient(180deg, #e8e0d6 0%, #ddd4c8 100%);
+		box-shadow: inset 0 1px 0 rgba(255,255,255,0.4);
+	}
+
+	.sponsors-hero .eyebrow {
+		display: block;
+		font-size: 0.7rem;
+		font-weight: 700;
+		letter-spacing: 0.2em;
+		text-transform: uppercase;
+		color: var(--color-sepia);
+		margin-bottom: 0.5rem;
+		font-family: var(--font-body);
+	}
+
+	.sponsors-hero .hero-title {
+		font-family: var(--font-display);
+		font-size: clamp(2rem, 4vw, 3rem);
+		font-weight: 600;
+		color: var(--color-ink);
+		margin: 0 0 0.5rem 0;
+		line-height: 1.2;
+	}
+
+	.sponsors-hero .tagline {
+		font-size: 1.125rem;
+		color: var(--color-sepia);
+		margin: 0;
+		font-weight: 500;
+	}
+
+	.sponsors-content {
+		position: relative;
+		z-index: 1;
+		padding: 4rem 2rem;
+		background: linear-gradient(180deg, #ddd4c8 0%, #d2c8ba 100%);
+		box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.04);
+	}
+
+	.sponsors-inner {
+		max-width: 640px;
+		margin: 0 auto;
+		text-align: center;
+	}
+
+	.sponsors-intro {
+		font-family: var(--font-body);
+		font-size: 1.0625rem;
+		color: var(--color-ink);
+		line-height: 1.7;
+		margin-bottom: 2rem;
+	}
+
+	.sponsors-cta p {
+		font-size: 1rem;
+		color: var(--color-ink);
+		margin-bottom: 1rem;
+		font-weight: 500;
+	}
+
+	.btn {
+		display: inline-block;
+		padding: 0.85rem 1.75rem;
+		border-radius: 50px;
+		text-decoration: none;
+		font-weight: 700;
+		font-size: 0.9rem;
+		letter-spacing: 0.04em;
+		transition: transform 0.2s ease, box-shadow 0.2s ease;
+		font-family: var(--font-body);
+	}
+
+	.btn-primary {
+		background: var(--color-ink);
+		color: var(--color-cream);
+	}
+
+	.btn-primary:hover {
+		transform: translateY(-1px);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+	}
+</style>

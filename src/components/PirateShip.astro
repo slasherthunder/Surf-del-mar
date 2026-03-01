@@ -1,0 +1,466 @@
+---
+/**
+ * Pirate ship that sails left-right on the waves.
+ * Shown when lighthouse is in "pirate mode" (beam active).
+ * Click ship to toggle fog + spotlight effect.
+ */
+---
+
+<div class="pirate-ship-wrap" aria-hidden="true">
+	<svg viewBox="0 0 80 40" fill="none" xmlns="http://www.w3.org/2000/svg" class="pirate-ship" title="Click for fog effect">
+		<g class="hull">
+			<!-- Hull: taller stern, sharper bow -->
+			<path d="M6 37 Q6 33 10 28 L16 25 Q24 23 32 25 L50 25 Q62 23 68 27 L76 28 L76 32 L72 36 L68 38 Q50 39 32 39 Q14 39 8 38 L4 36 Z" fill="#5D4037" stroke="#3E2723" stroke-width="0.8"/>
+			<!-- Darker lower hull strip -->
+			<path d="M8 37 L14 35 L32 35 L52 35 L70 36 L72 37 L68 38 Q50 39 32 39 Q14 39 10 38 Z" fill="#4E342E" fill-opacity="0.5"/>
+			<!-- Highlight line near top edge -->
+			<path d="M12 28 Q22 26 38 27 Q54 26 66 28" stroke="#8B7355" stroke-width="0.4" fill="none" opacity="0.5"/>
+			<!-- Wood plank lines -->
+			<line x1="16" y1="30" x2="12" y2="36" stroke="#4E342E" stroke-width="0.35" opacity="0.5"/>
+			<line x1="26" y1="28" x2="22" y2="37" stroke="#4E342E" stroke-width="0.35" opacity="0.5"/>
+			<line x1="42" y1="27" x2="38" y2="37" stroke="#4E342E" stroke-width="0.35" opacity="0.5"/>
+			<line x1="56" y1="28" x2="52" y2="36" stroke="#4E342E" stroke-width="0.35" opacity="0.5"/>
+			<!-- Portholes -->
+			<circle cx="22" cy="30" r="1.5" fill="#1a1a1a" stroke="#3E2723" stroke-width="0.3"/>
+			<circle cx="42" cy="29" r="1.5" fill="#1a1a1a" stroke="#3E2723" stroke-width="0.3"/>
+			<circle cx="60" cy="30" r="1.2" fill="#1a1a1a" stroke="#3E2723" stroke-width="0.3"/>
+			<!-- Bow: sharper cut -->
+			<path d="M6 37 L2 35 L5 36 Z" fill="#6D4C41" stroke="#3E2723" stroke-width="0.5"/>
+		</g>
+		<!-- Main mast -->
+		<line x1="38" y1="38" x2="38" y2="4" stroke="#5D4037" stroke-width="1.2"/>
+		<!-- Rear mast -->
+		<line x1="58" y1="35" x2="58" y2="14" stroke="#5D4037" stroke-width="0.8"/>
+		<g class="sails">
+			<!-- Main sail: wind left→right, asymmetric bulge right -->
+			<path d="M38 4 L38 36 Q48 34 52 22 Q50 8 38 4" fill="#F5F5DC" stroke="#8B7355" stroke-width="0.6"/>
+			<path d="M38 12 Q44 14 46 22 Q44 28 38 30" fill="#8B7355" fill-opacity="0.12"/>
+			<!-- Rear sail: wind-filled, bulge right -->
+			<path d="M58 14 L58 34 Q64 32 66 24 Q64 16 58 14" fill="#EDE8D8" stroke="#8B7355" stroke-width="0.5"/>
+			<path d="M58 20 Q62 22 62 24 Q61 28 58 30" fill="#8B7355" fill-opacity="0.1"/>
+			<!-- Rope tension lines toward sails -->
+			<line x1="36" y1="6" x2="32" y2="14" stroke="#8B7355" stroke-width="0.3" opacity="0.6"/>
+			<line x1="40" y1="6" x2="44" y2="12" stroke="#8B7355" stroke-width="0.3" opacity="0.6"/>
+			<line x1="56" y1="16" x2="52" y2="22" stroke="#8B7355" stroke-width="0.25" opacity="0.6"/>
+			<line x1="60" y1="16" x2="62" y2="22" stroke="#8B7355" stroke-width="0.25" opacity="0.6"/>
+			<!-- Pirate flag: curved waving (wind left→right) -->
+			<path d="M38 0.5 Q44 1.5 46 2.5 Q44 4 38 5 L38 0.5 Z" fill="#1a1a1a" stroke="#333" stroke-width="0.4"/>
+			<!-- Skull and crossbones: glow in fog mode -->
+			<g class="pirate-emblem">
+				<circle cx="41" cy="2.5" r="1" fill="#fff"/>
+				<circle cx="40.4" cy="2.2" r="0.35" fill="#1a1a1a"/>
+				<circle cx="41.6" cy="2.2" r="0.35" fill="#1a1a1a"/>
+				<path d="M40.2 3.1 Q41 3.4 41.8 3.1" stroke="#1a1a1a" stroke-width="0.2" fill="none"/>
+				<path d="M39.5 2.2 L42.5 2.2" stroke="#fff" stroke-width="0.15"/>
+				<path d="M40.5 1.5 L42 3.2 M41.5 1.5 L40 3.2" stroke="#fff" stroke-width="0.12"/>
+			</g>
+		</g>
+		<!-- Crow's nest -->
+		<rect x="35" y="8" width="6" height="4" rx="1" fill="#5D4037" stroke="#3E2723" stroke-width="0.5"/>
+	</svg>
+	<!-- Fog overlay: sits on top of ship and waves when fog mode is on -->
+	<div class="fog-overlay" id="fog-overlay" aria-hidden="true">
+		<div class="parallax-mist" aria-hidden="true"></div>
+	</div>
+</div>
+
+<script>
+	(function initFogSpotlight() {
+		const shipWrap = document.querySelector('.pirate-ship-wrap');
+		const ship = document.querySelector('.pirate-ship');
+		const waveWrap = shipWrap?.closest('.wave-wrap') ?? document.getElementById('festival-wave-wrap') ?? document.getElementById('home-wave-wrap');
+		const fogOverlay = document.querySelector('.fog-overlay');
+		if (!shipWrap || !ship || !waveWrap || !fogOverlay) return;
+
+		ship.style.pointerEvents = 'auto';
+		ship.style.cursor = 'pointer';
+
+		function toggleFog() {
+			waveWrap.classList.toggle('fog-mode');
+		}
+
+		function resetVoyage() {
+			waveWrap.classList.remove('fog-mode');
+		}
+
+		ship.addEventListener('click', (e) => {
+			e.stopPropagation();
+			toggleFog();
+			if (waveWrap.classList.contains('fog-mode')) {
+				hideHole = false;
+				pendingClientX = e.clientX;
+				pendingClientY = e.clientY;
+				if (rafId === null) rafId = requestAnimationFrame(updateMask);
+
+				ship.addEventListener('animationend', (ev) => {
+					if (ev.animationName === 'grand-voyage') {
+						resetVoyage();
+					}
+				}, { once: true });
+			}
+		});
+
+		fogOverlay.addEventListener('click', (e) => {
+			e.stopPropagation();
+			if (waveWrap.classList.contains('fog-mode')) {
+				resetVoyage();
+			}
+		});
+
+		let rafId = null;
+		let pendingClientX = null;
+		let pendingClientY = null;
+		let hideHole = false;
+
+		function updateMask() {
+			rafId = null;
+			if (hideHole) {
+				fogOverlay.style.setProperty('--hole-scale', '0');
+				return;
+			}
+			if (pendingClientX === null || pendingClientY === null) return;
+			const rect = fogOverlay.getBoundingClientRect();
+			const x = pendingClientX - rect.left;
+			const y = pendingClientY - rect.top;
+			fogOverlay.style.setProperty('--mouse-x', `${x}px`);
+			fogOverlay.style.setProperty('--mouse-y', `${y}px`);
+			fogOverlay.style.setProperty('--hole-scale', '1');
+			pendingClientX = null;
+			pendingClientY = null;
+		}
+
+		waveWrap.addEventListener('mousemove', (e) => {
+			if (!waveWrap.classList.contains('fog-mode')) return;
+			hideHole = false;
+			pendingClientX = e.clientX;
+			pendingClientY = e.clientY;
+			if (rafId === null) {
+				rafId = requestAnimationFrame(updateMask);
+			}
+		});
+
+		waveWrap.addEventListener('mouseleave', () => {
+			if (waveWrap.classList.contains('fog-mode')) {
+				hideHole = true;
+				if (rafId === null) {
+					rafId = requestAnimationFrame(updateMask);
+				}
+			}
+		});
+	})();
+</script>
+
+<style>
+	.pirate-ship-wrap {
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+		z-index: 10;
+		opacity: 0;
+		perspective: 1000px;
+		visibility: hidden;
+		transition: opacity 0.4s ease, visibility 0.4s ease;
+	}
+
+	/* Shown when wave-wrap has .pirate-mode */
+	:global(.pirate-mode) .pirate-ship-wrap {
+		opacity: 1;
+		visibility: visible;
+	}
+
+	/* Ship clickable when visible */
+	:global(.pirate-mode) .pirate-ship {
+		cursor: pointer;
+		pointer-events: auto;
+	}
+
+	/* Fog overlay: organic mist with mask hole, blur, and glow. */
+	.fog-overlay {
+		--mouse-x: 50%;
+		--mouse-y: 50%;
+		--hole-scale: 0;
+		position: absolute;
+		inset: 0;
+		overflow: hidden;
+		pointer-events: none;
+		z-index: 2;
+		will-change: mask-image;
+		opacity: 0;
+		visibility: hidden;
+		transition: opacity 1s ease-out, visibility 0.5s ease, --hole-scale 0.4s ease-out;
+		backdrop-filter: blur(4px);
+		-webkit-backdrop-filter: blur(4px);
+		background:
+			rgba(70, 73, 78, 0.92),
+			repeating-radial-gradient(
+				circle at 0 0,
+				rgba(80, 82, 85, 0.35) 0,
+				transparent 40px
+			),
+			repeating-radial-gradient(
+				circle at 60px 60px,
+				rgba(75, 77, 80, 0.3) 0,
+				transparent 50px
+			),
+			repeating-radial-gradient(
+				circle at 120px 0,
+				rgba(72, 74, 77, 0.25) 0,
+				transparent 35px
+			);
+		background-size: 100% 100%, 200% 200%, 250% 250%, 180% 180%;
+		background-position: 0 0, 0 0, 0 0, 0 0;
+		animation: drift 25s ease-in-out infinite;
+		-webkit-mask-image:
+			radial-gradient(
+				circle at var(--mouse-x) var(--mouse-y),
+				black 0%,
+				black calc(var(--hole-scale) * 18px),
+				rgba(20, 20, 20, 0.6) calc(var(--hole-scale) * 32px),
+				rgba(100, 100, 100, 0.9) calc(var(--hole-scale) * 52px),
+				white calc(var(--hole-scale) * 65px)
+			),
+			radial-gradient(
+				circle 200px at var(--mouse-x) var(--mouse-y),
+				white 0%,
+				rgba(230, 230, 230, 0.85) calc(var(--hole-scale) * 100px),
+				rgba(245, 245, 245, 0.95) calc(var(--hole-scale) * 150px),
+				white calc(var(--hole-scale) * 200px)
+			);
+		mask-image:
+			radial-gradient(
+				circle at var(--mouse-x) var(--mouse-y),
+				black 0%,
+				black calc(var(--hole-scale) * 18px),
+				rgba(20, 20, 20, 0.6) calc(var(--hole-scale) * 32px),
+				rgba(100, 100, 100, 0.9) calc(var(--hole-scale) * 52px),
+				white calc(var(--hole-scale) * 65px)
+			),
+			radial-gradient(
+				circle 200px at var(--mouse-x) var(--mouse-y),
+				white 0%,
+				rgba(230, 230, 230, 0.85) calc(var(--hole-scale) * 100px),
+				rgba(245, 245, 245, 0.95) calc(var(--hole-scale) * 150px),
+				white calc(var(--hole-scale) * 200px)
+			);
+		-webkit-mask-size: 100% 100%;
+		mask-size: 100% 100%;
+		-webkit-mask-repeat: no-repeat;
+		mask-repeat: no-repeat;
+		-webkit-mask-composite: source-in;
+		mask-composite: intersect;
+	}
+
+	@property --flicker-opacity {
+		syntax: '<number>';
+		inherits: false;
+		initial-value: 1;
+	}
+
+	.fog-overlay::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+		background:
+			repeating-radial-gradient(
+				circle at 0 0,
+				rgba(255, 255, 255, 0.04) 0,
+				transparent 8px
+			),
+			repeating-radial-gradient(
+				circle at 25px 15px,
+				rgba(255, 255, 255, 0.03) 0,
+				transparent 6px
+			),
+			repeating-radial-gradient(
+				circle at 50px 40px,
+				rgba(255, 255, 255, 0.035) 0,
+				transparent 10px
+			),
+			repeating-radial-gradient(
+				circle at 15px 55px,
+				rgba(255, 255, 255, 0.025) 0,
+				transparent 7px
+			);
+		background-size: 80px 80px, 60px 60px, 100px 100px, 70px 70px;
+		background-position: 0 0, 0 0, 0 0, 0 0;
+		animation: mist-particles 18s linear infinite;
+	}
+
+	/* Parallax mist: finer texture at half speed for 3D depth */
+	.parallax-mist {
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+		background: repeating-radial-gradient(
+			rgba(255, 255, 255, 0.05) 0px,
+			transparent 2px
+		);
+		background-size: 24px 24px;
+		background-position: 0 0;
+		animation: parallax-mist 50s linear infinite;
+	}
+
+	@keyframes parallax-mist {
+		0%, 100% { background-position: 0 0; }
+		25% { background-position: -12px 8px; }
+		50% { background-position: 8px -12px; }
+		75% { background-position: -8px -8px; }
+	}
+
+	.fog-overlay::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+		transform-origin: center center;
+		background: radial-gradient(
+			circle 65px at var(--mouse-x) var(--mouse-y),
+			#fff5c8 0%,
+			rgba(255, 245, 200, 0.5) 28%,
+			rgba(255, 235, 180, 0.15) 70%,
+			transparent 100%
+		);
+		mix-blend-mode: overlay;
+		opacity: calc(var(--hole-scale) * var(--flicker-opacity));
+		animation: lantern-flicker 2.5s ease-in-out infinite;
+	}
+
+	@keyframes drift {
+		0%, 100% { background-position: 0 0, 0 0, 0 0, 0 0; }
+		25% { background-position: 0 0, 5% 10%, -3% 5%, 8% 0; }
+		50% { background-position: 0 0, -8% -5%, 10% 8%, -5% 12%; }
+		75% { background-position: 0 0, 3% -10%, -5% -8%, 10% 5%; }
+	}
+
+	@keyframes mist-particles {
+		0%, 100% { background-position: 0 0, 0 0, 0 0, 0 0; }
+		25% { background-position: 20px -15px, -10px 25px, 15px 10px, -25px -5px; }
+		50% { background-position: -15px 20px, 25px -10px, -20px 15px, 10px 20px; }
+		75% { background-position: 10px 15px, -20px -15px, 25px -20px, -15px 10px; }
+	}
+
+	@keyframes lantern-flicker {
+		0%, 100% { --flicker-opacity: 0.92; transform: scale(1); }
+		30% { --flicker-opacity: 1; transform: scale(1.04); }
+		60% { --flicker-opacity: 0.96; transform: scale(0.98); }
+	}
+
+	:global(.fog-mode) .fog-overlay {
+		visibility: visible;
+		pointer-events: auto;
+		animation: fog-voyage 35s cubic-bezier(0.45, 0.05, 0.55, 0.95) forwards;
+	}
+
+	@keyframes fog-voyage {
+		0% { opacity: 0; backdrop-filter: blur(0); -webkit-backdrop-filter: blur(0); }
+		10% { opacity: 0.6; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+		25% { opacity: 1; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+		50% { opacity: 1; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+		75% { opacity: 1; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+		90% { opacity: 0.5; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+		100% { opacity: 0; backdrop-filter: blur(0); -webkit-backdrop-filter: blur(0); }
+	}
+
+	.pirate-ship {
+		position: absolute;
+		left: 60px;
+		bottom: 40%;
+		width: 60px;
+		height: 30px;
+		display: block;
+		filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3));
+		color: #5D4037;
+		transform-origin: 30px 30px 0;
+		animation: ship-tilt 8s ease-in-out infinite;
+		transition: all 2.5s cubic-bezier(0.4, 0, 0.2, 1);
+		will-change: transform;
+		transform-style: preserve-3d;
+		backface-visibility: hidden;
+	}
+
+	.pirate-ship::after {
+		content: '';
+		position: absolute;
+		left: 50%;
+		bottom: -8px;
+		width: 80px;
+		height: 20px;
+		margin-left: -40px;
+		background: radial-gradient(
+			ellipse 80% 100% at 50% 0%,
+			rgba(255, 255, 255, 0.25) 0%,
+			rgba(255, 255, 255, 0.08) 40%,
+			transparent 100%
+		);
+		opacity: 0;
+		pointer-events: none;
+	}
+
+	:global(.fog-mode) .pirate-ship::after {
+		opacity: 1;
+	}
+
+	:global(.fog-mode) .pirate-ship {
+		transition: none !important;
+		will-change: transform;
+		animation: grand-voyage 35s cubic-bezier(0.45, 0.05, 0.55, 0.95) forwards;
+	}
+
+	:global(.fog-mode) .pirate-ship {
+		filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3)) brightness(1);
+	}
+
+	:global(.fog-mode) .pirate-ship .pirate-emblem {
+		filter: drop-shadow(0 0 2px #fff);
+	}
+
+	/* Sails: gentle sway when idle, flip when sailing in fog */
+	.pirate-ship .sails {
+		transform-origin: 38px 20px;
+	}
+
+	:global(.fog-mode) .pirate-ship .sails {
+		animation: sail-direction 35s cubic-bezier(0.45, 0.05, 0.55, 0.95) forwards;
+	}
+
+	@keyframes ship-tilt {
+		0%, 100% { transform: rotate(-4deg); }
+		50% { transform: rotate(4deg); }
+	}
+
+	@keyframes sail-direction {
+		0%, 44.99% { transform: scaleX(1); }
+		45%, 100% { transform: scaleX(-1); }
+	}
+
+	@keyframes grand-voyage {
+		0% { transform: translate3d(0, 0, 0); }
+		45% { transform: translate3d(calc(100vw - 320px), 0, 0) rotate(10deg); }
+		85% { transform: translate3d(0, 0, 0) rotate(-5deg); }
+		92% { transform: translate3d(0, -20px, 0) rotate(5deg); }
+		100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+	}
+
+	@media (max-width: 640px) {
+		.pirate-ship {
+			width: 50px;
+			height: 25px;
+			left: 40px;
+			transform-origin: 25px 25px 0;
+		}
+		:global(.fog-mode) .pirate-ship {
+			animation: grand-voyage 35s cubic-bezier(0.45, 0.05, 0.55, 0.95) forwards;
+		}
+		:global(.fog-mode) .pirate-ship .sails {
+			animation: sail-direction 35s cubic-bezier(0.45, 0.05, 0.55, 0.95) forwards;
+		}
+		@keyframes grand-voyage {
+			0% { transform: translate3d(0, 0, 0); }
+			45% { transform: translate3d(calc(100vw - 320px), 0, 0) rotate(10deg); }
+			85% { transform: translate3d(0, 0, 0) rotate(-5deg); }
+			92% { transform: translate3d(0, -20px, 0) rotate(5deg); }
+			100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+		}
+	}
+</style>

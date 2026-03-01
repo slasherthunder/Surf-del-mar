@@ -1,0 +1,242 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Festival Schedule" description="Surf Del Mar 4-day festival schedule — October 8–11, 2026.">
+	<section class="hero schedule-hero">
+		<div class="hero-content">
+			<span class="eyebrow">4-Day Event</span>
+			<h1 class="hero-title">Surf Del Mar Schedule</h1>
+			<p class="tagline">October 8–11, 2026</p>
+		</div>
+	</section>
+
+	<section class="schedule-content">
+		<div class="container schedule-inner">
+			<div class="schedule-day">
+				<h2 class="schedule-day-title">Thursday, October 8<sup>th</sup></h2>
+				<article class="event-card">
+					<h3>Opening Reception — Meet and Greet · Surfing Art Walk · Music by Peter Sprague and group</h3>
+					<p class="schedule-meta"><strong>Venue:</strong> Del Mar Plaza<br/><strong>Time:</strong> 3:00 pm to 6:30 pm</p>
+				</article>
+				<article class="event-card event-card-advocacy">
+					<h3>Climate Change / Conservation Symposium</h3>
+					<p class="schedule-meta"><strong>Venue:</strong> St. Peter's Hall<br/><strong>Time:</strong> 10:00 am to 3:00 pm</p>
+				</article>
+			</div>
+
+			<div class="schedule-day">
+				<h2 class="schedule-day-title">Friday, October 9<sup>th</sup></h2>
+				<article class="event-card">
+					<h3>Surfing Film Festival</h3>
+					<p class="schedule-meta"><strong>Venue:</strong> St. Peter's Hall<br/><strong>Time:</strong> 11:00 am to 5:00 pm (Daytime) · 6:00 pm to 9:00 pm (Evening)</p>
+				</article>
+			</div>
+
+			<div class="schedule-day">
+				<h2 class="schedule-day-title">Saturday, October 10<sup>th</sup></h2>
+				<article class="event-card">
+					<h3>Surfer's Reunion</h3>
+					<p class="schedule-meta"><strong>Venue:</strong> Powerhouse Park<br/><strong>Time:</strong> 11:00 am to 9:00 pm</p>
+				</article>
+				<article class="event-card">
+					<h3>Surfwriter's Book Fair</h3>
+					<p class="schedule-meta"><strong>Venue:</strong> TBD<br/><strong>Time:</strong> 10:00 am to 3:00 pm</p>
+				</article>
+				<article class="event-card">
+					<h3>Woody Wagon Parade Through Del Mar and Display</h3>
+					<p class="schedule-meta"><strong>Venue:</strong> Del Mar Train Station<br/><strong>Time:</strong> 11:00 am to 3:00 pm</p>
+				</article>
+				<article class="event-card">
+					<h3>Afternoon Concert with The MarDels</h3>
+					<p class="schedule-meta"><strong>Venue:</strong> Powerhouse Park<br/><strong>Time:</strong> 2:00 pm to 4:30 pm</p>
+				</article>
+				<article class="event-card">
+					<h3>VIP Reception</h3>
+					<p class="schedule-meta"><strong>Venue:</strong> Community Room at Powerhouse Park<br/><strong>Time:</strong> 5:00 pm to 7:00 pm</p>
+				</article>
+				<article class="event-card">
+					<h3>Film Presentation: <em>Endless Summer</em></h3>
+					<p class="schedule-meta"><strong>Venue:</strong> Powerhouse Park Stage<br/><strong>Time:</strong> 6:00 pm to 9:00 pm</p>
+				</article>
+			</div>
+
+			<div class="schedule-day">
+				<h2 class="schedule-day-title">Sunday, October 11<sup>th</sup></h2>
+				<article class="event-card">
+					<h3>Surfwriter's Book Fair</h3>
+					<p class="schedule-meta"><strong>Venue:</strong> TBD<br/><strong>Time:</strong> 10:00 am to 3:00 pm</p>
+				</article>
+				<article class="event-card">
+					<h3>Student Art Walk</h3>
+					<p class="schedule-meta"><strong>Venue:</strong> TBD<br/><strong>Time:</strong> 10:00 am to 3:00 pm</p>
+				</article>
+			</div>
+
+			<p class="schedule-cta">
+				<a href="/surfing-festival/" class="btn btn-primary">Back to Surfing Festival</a>
+			</p>
+		</div>
+	</section>
+</BaseLayout>
+
+<style>
+	.hero.schedule-hero {
+		padding: 3rem 2rem;
+		text-align: center;
+		background: linear-gradient(180deg, #e8e0d6 0%, #ddd4c8 100%);
+		box-shadow: inset 0 1px 0 rgba(255,255,255,0.4);
+	}
+
+	.schedule-hero .eyebrow {
+		display: block;
+		font-size: 0.7rem;
+		font-weight: 700;
+		letter-spacing: 0.2em;
+		text-transform: uppercase;
+		color: var(--color-sepia);
+		margin-bottom: 0.5rem;
+		font-family: var(--font-body);
+	}
+
+	.schedule-hero .hero-title {
+		font-family: var(--font-display);
+		font-size: clamp(2rem, 4vw, 3rem);
+		font-weight: 600;
+		color: var(--color-ink);
+		margin: 0 0 0.5rem 0;
+		line-height: 1.2;
+	}
+
+	.schedule-hero .tagline {
+		font-size: 1.25rem;
+		color: var(--color-sepia);
+		margin: 0;
+		font-weight: 500;
+	}
+
+	.schedule-content {
+		position: relative;
+		z-index: 1;
+		padding: 4rem 2rem;
+		background: linear-gradient(180deg, #ddd4c8 0%, #d2c8ba 100%);
+		box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.04);
+	}
+
+	.schedule-content .schedule-inner {
+		max-width: 820px;
+		margin: 0 auto;
+	}
+
+	.schedule-day {
+		margin-bottom: 2.5rem;
+	}
+
+	.schedule-day:last-of-type {
+		margin-bottom: 2rem;
+	}
+
+	.schedule-day-title {
+		font-family: var(--font-display);
+		font-size: clamp(1.5rem, 3.5vw, 1.85rem);
+		font-weight: 600;
+		color: var(--color-ink);
+		margin: 0 0 1rem 0;
+		line-height: 1.25;
+		text-transform: uppercase;
+		letter-spacing: 0.03em;
+	}
+
+	.schedule-day-title sup {
+		font-size: 0.6em;
+		text-transform: lowercase;
+	}
+
+	.schedule-day .event-card {
+		margin-bottom: 1rem;
+	}
+
+	.schedule-day .event-card:last-child {
+		margin-bottom: 0;
+	}
+
+	.schedule-meta {
+		font-family: var(--font-body);
+		font-size: 0.95rem;
+		color: var(--color-ink);
+		line-height: 1.7;
+		margin: 0.5rem 0 0 0;
+		opacity: 0.95;
+	}
+
+	.event-card {
+		background: rgba(255, 255, 255, 0.4);
+		backdrop-filter: blur(10px);
+		-webkit-backdrop-filter: blur(10px);
+		padding: 1.5rem 1.5rem 1.5rem 1.25rem;
+		border-radius: 12px;
+		border: 1px solid rgba(255, 255, 255, 0.5);
+		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+		border-left: 6px solid #8b7355;
+		transition: transform 0.3s ease, box-shadow 0.3s ease;
+	}
+
+	.event-card:hover {
+		transform: translateX(10px);
+		box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
+	}
+
+	.event-card h3 {
+		font-family: var(--font-display);
+		font-size: 1.2rem;
+		font-weight: 600;
+		color: var(--color-ink);
+		margin: 0 0 0.6rem 0;
+		line-height: 1.3;
+	}
+
+	.event-card p {
+		font-family: var(--font-body);
+		font-size: 1rem;
+		color: var(--color-ink);
+		line-height: 1.7;
+		margin: 0;
+	}
+
+	.event-card-advocacy {
+		border-left-color: #e6b800;
+		background: rgba(255, 248, 220, 0.35);
+		box-shadow: 0 4px 20px rgba(230, 184, 0, 0.08);
+	}
+
+	.event-card-advocacy:hover {
+		box-shadow: 0 8px 28px rgba(230, 184, 0, 0.12);
+	}
+
+	.schedule-cta {
+		text-align: center;
+		margin: 0;
+	}
+
+	.btn {
+		display: inline-block;
+		padding: 0.85rem 1.75rem;
+		border-radius: 50px;
+		text-decoration: none;
+		font-weight: 700;
+		font-size: 0.9rem;
+		letter-spacing: 0.04em;
+		transition: transform 0.2s ease, box-shadow 0.2s ease;
+		font-family: var(--font-body);
+	}
+
+	.btn-primary {
+		background: var(--color-ink);
+		color: var(--color-cream);
+	}
+
+	.btn-primary:hover {
+		transform: translateY(-1px);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+	}
+</style>

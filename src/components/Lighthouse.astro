@@ -1,0 +1,387 @@
+---
+/**
+ * Lighthouse Location Reveal Component
+ * Premium, cinematic coastal design with radial-gradient beam,
+ * soft glow, sweeping motion, and spotlight bubble.
+ * Optional: toggleTargetId - when provided, toggles .pirate-mode on that element (swaps surfer for pirate ship).
+ */
+interface Props {
+	toggleTargetId?: string;
+}
+const { toggleTargetId } = Astro.props;
+---
+
+<div class="lighthouse-wrap">
+	<!-- Spray zone: wave-crash particles -->
+	<div class="spray-zone" aria-hidden="true"></div>
+	<!-- Rocky outcrop: California coastal bluffs with sedimentary texture -->
+	<div class="lighthouse-rock" aria-hidden="true">
+		<svg viewBox="0 0 200 100" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+			<defs>
+				<linearGradient id="rock-fill" x1="0%" y1="0%" x2="100%" y2="100%">
+					<stop offset="0%" stop-color="#d4b996"/>
+					<stop offset="40%" stop-color="#bc9a73"/>
+					<stop offset="70%" stop-color="#8b6b4d"/>
+					<stop offset="100%" stop-color="#7a5d42"/>
+				</linearGradient>
+			</defs>
+			<!-- Main rock mass -->
+			<path d="M0 80 L0 55 C30 45, 70 35, 110 28 C150 22, 180 18, 200 15 L200 100 L0 100 Z" fill="url(#rock-fill)"/>
+			<!-- Sedimentary texture: layered bluff strokes -->
+			<path d="M0 65 Q25 58 45 62 T90 55 T130 60" stroke="#a08060" stroke-width="0.6" opacity="0.4" fill="none"/>
+			<path d="M20 75 Q50 68 80 72 T120 66 T155 70" stroke="#8b7355" stroke-width="0.5" opacity="0.35" fill="none"/>
+			<path d="M0 82 Q35 75 70 78 T110 72" stroke="#6b5344" stroke-width="0.5" opacity="0.3" fill="none"/>
+			<path d="M55 48 Q75 42 95 48 L110 45" stroke="#9a7d5a" stroke-width="0.4" opacity="0.35" fill="none"/>
+			<path d="M100 35 Q125 30 150 38 L170 32" stroke="#a89070" stroke-width="0.4" opacity="0.3" fill="none"/>
+			<!-- California Fan Palms -->
+			<g class="palm-1" transform="translate(148, -5)">
+				<path d="M0 80 L1 70 Q2 40 3 0 L5 0 Q6 40 7 70 L8 80 Z" fill="#5d4037" />
+				<path d="M2.5 60 L5.5 60 M2.8 45 L5.8 45 M3.2 30 L6.2 30 M3.8 15 L6.8 15" stroke="rgba(0,0,0,0.2)" stroke-width="0.4" />
+				<g transform="translate(4, 2)" fill="#2e7d32">
+					<path d="M0 0 Q-15 -8 -24 8 Q-12 4 0 0 Z" opacity="0.8"/>
+					<path d="M0 0 Q15 -8 24 8 Q12 4 0 0 Z" opacity="0.8"/>
+					<path d="M0 0 Q-20 6 -14 24 Q-8 12 0 0 Z" fill="#388e3c"/>
+					<path d="M0 0 Q20 6 14 24 Q8 12 0 0 Z" fill="#388e3c"/>
+					<path d="M0 0 Q-6 18 0 30 Q6 18 0 0 Z" fill="#4caf50"/>
+					<path d="M0 0 Q-12 -14 0 -20 Q12 -14 0 0 Z" fill="#1b5e20"/>
+				</g>
+			</g>
+			<g class="palm-2" transform="translate(175, 12) scale(0.85)">
+				<path d="M0 60 L0.5 50 Q1.5 25 2 0 L4 0 Q4.5 25 5.5 50 L6 60 Z" fill="#4e342e" />
+				<g transform="translate(3, 0)" fill="#1b5e20">
+					<path d="M0 0 Q-14 -3 -20 10 Q-8 6 0 0 Z" />
+					<path d="M0 0 Q14 -3 20 10 Q8 6 0 0 Z" />
+					<path d="M0 0 Q-6 14 0 24 Q6 14 0 0 Z" fill="#2e7d32" />
+					<path d="M0 0 Q0 -14 10 -18 Q6 -6 0 0 Z" fill="#388e3c" />
+				</g>
+			</g>
+		</svg>
+	</div>
+	<button
+		type="button"
+		class="lighthouse"
+		aria-label="Click to reveal festival location"
+		aria-expanded="false"
+		title="Click for location"
+	>
+		<!-- Tower SVG: classic Pacific coast station -->
+		<div class="lighthouse-tower">
+			<svg viewBox="0 0 60 90" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+				<!-- Base foundation: wider, grounded -->
+				<path d="M8 90 L8 82 L26 72 L34 72 L52 82 L52 90 Z" fill="#3d3428" stroke="#2c2419" stroke-width="1"/>
+				<!-- Tower body: crisp white, two bold California Red stripes -->
+				<path d="M12 72 L12 28 L30 8 L48 28 L48 72 Z" fill="#ffffff" stroke="#e0e0e0" stroke-width="0.8"/>
+				<rect x="12" y="38" width="36" height="6" fill="#E63946"/>
+				<rect x="12" y="56" width="36" height="6" fill="#E63946"/>
+				<!-- Balcony platform: circular ring below lantern -->
+				<ellipse cx="30" cy="24" rx="18" ry="4" fill="#5a4a3a" stroke="#2c2419" stroke-width="1"/>
+				<!-- Railing posts around balcony -->
+				<line x1="15" y1="24" x2="15" y2="20" stroke="#2c2419" stroke-width="0.8"/>
+				<line x1="22" y1="21" x2="22" y2="17" stroke="#2c2419" stroke-width="0.8"/>
+				<line x1="30" y1="20" x2="30" y2="16" stroke="#2c2419" stroke-width="0.8"/>
+				<line x1="38" y1="21" x2="38" y2="17" stroke="#2c2419" stroke-width="0.8"/>
+				<line x1="45" y1="24" x2="45" y2="20" stroke="#2c2419" stroke-width="0.8"/>
+				<!-- Lantern room: glass with frame lines -->
+				<rect x="18" y="4" width="24" height="14" rx="1" fill="#a8d4e6" stroke="#2c2419" stroke-width="0.8"/>
+				<line x1="24" y1="4" x2="24" y2="18" stroke="#2c2419" stroke-width="0.5" opacity="0.7"/>
+				<line x1="30" y1="4" x2="30" y2="18" stroke="#2c2419" stroke-width="0.5" opacity="0.7"/>
+				<line x1="36" y1="4" x2="36" y2="18" stroke="#2c2419" stroke-width="0.5" opacity="0.7"/>
+				<line x1="18" y1="10" x2="42" y2="10" stroke="#2c2419" stroke-width="0.5" opacity="0.7"/>
+				<!-- Roof cap: small dome above lantern -->
+				<path d="M20 4 L30 0 L40 4 Z" fill="#6b5b50" stroke="#2c2419" stroke-width="0.8"/>
+				<!-- Light dome (lens) -->
+				<ellipse cx="30" cy="6" rx="6" ry="2.5" fill="#FFE66D" stroke="#2c2419" stroke-width="0.6"/>
+			</svg>
+		</div>
+
+		<!-- Beam: triangle (point at lighthouse), circle on base at top -->
+		<div class="beam">
+			<!-- Circle: at top of beam, sits on triangle's base -->
+			<div class="beam-circle">
+				<span class="location-text">Location: Powerhouse Park, Del Mar</span>
+			</div>
+			<!-- Triangle: flat edge at top (meets circle), point at bottom toward lighthouse -->
+			<div class="beam-light"></div>
+		</div>
+	</button>
+</div>
+
+<script define:vars={{ toggleTargetId }}>
+	// Toggle beam on click; optionally toggle pirate mode on wave wrap
+	const lighthouse = document.querySelector('.lighthouse');
+	if (lighthouse) {
+		lighthouse.addEventListener('click', () => {
+			lighthouse.classList.toggle('shining');
+			const isShining = lighthouse.classList.contains('shining');
+			lighthouse.setAttribute('aria-expanded', isShining);
+			if (toggleTargetId) {
+				const target = document.getElementById(toggleTargetId);
+				if (target) target.classList.toggle('pirate-mode', isShining);
+			}
+		});
+	}
+
+	// Crashing spray particle system – syncs with wave rhythm
+	function createSpray() {
+		const zone = document.querySelector('.spray-zone');
+		if (!zone) return;
+		const count = 6 + Math.floor(Math.random() * 5);
+		for (let i = 0; i < count; i++) {
+			const p = document.createElement('div');
+			p.className = 'particle';
+			const size = 2 + Math.random() * 4;
+			const left = 50 + Math.random() * 45;
+			const delay = Math.random() * 0.3;
+			const dx = (Math.random() - 0.5) * 40;
+			const dy = -25 - Math.random() * 50;
+			p.style.cssText = `width:${size}px;height:${size}px;left:${left}%;animation-delay:${delay}s;--dx:${dx}px;--dy:${dy}px`;
+			zone.appendChild(p);
+			setTimeout(() => p.remove(), 1200);
+		}
+	}
+
+	const wrap = document.querySelector('.lighthouse-wrap');
+	if (wrap) {
+		createSpray();
+		// Sync with wave rhythm: ~3.2s matches wave-crash feel against sandstone
+		setInterval(createSpray, 3200);
+	}
+</script>
+
+<style>
+	/* ===== Container: corner-pinned to bottom-right ===== */
+	.lighthouse-wrap {
+		position: absolute;
+		right: 0;
+		bottom: 0;
+		z-index: 5;
+		width: 200px;
+		height: 140px;
+	}
+
+	/* ===== Spray zone: wave-crash particles ===== */
+	.spray-zone {
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+		z-index: 2;
+	}
+
+	.particle {
+		position: absolute;
+		bottom: 18%;
+		background: rgba(255, 255, 255, 0.85);
+		border-radius: 50%;
+		animation: spray-burst 1s ease-out forwards;
+	}
+
+	@keyframes spray-burst {
+		0% {
+			opacity: 1;
+			transform: translate(0, 0) scale(1);
+		}
+		100% {
+			opacity: 0;
+			transform: translate(var(--dx, -15px), var(--dy, -40px)) scale(0.2);
+		}
+	}
+
+	/* ===== Rock: foreground foundation, pinned to bottom-right corner ===== */
+	.lighthouse-rock {
+		position: absolute;
+		right: 0;
+		bottom: 0;
+		width: 180px;
+		height: 65px;
+		z-index: 1;
+		pointer-events: none;
+	}
+
+	.lighthouse-rock svg {
+		width: 100%;
+		height: 100%;
+		display: block;
+	}
+
+	/* ===== Button / Lighthouse tower: glued to rock, base sunk into stone ===== */
+	.lighthouse {
+		position: absolute;
+		right: 55px;
+		bottom: 45px;
+		z-index: 10;
+		width: 50px;
+		height: 75px;
+		padding: 0;
+		border: none;
+		background: none;
+		cursor: pointer;
+		display: block;
+		transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+	}
+
+	.lighthouse:hover {
+		transform: scale(1.08);
+	}
+
+	/* ===== Tower SVG ===== */
+	.lighthouse-tower {
+		position: relative;
+		z-index: 2;
+		width: 100%;
+		height: 100%;
+		filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.15));
+		transition: filter 0.3s ease;
+	}
+
+	.lighthouse:hover .lighthouse-tower {
+		filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.15)) drop-shadow(0 0 12px rgba(255, 230, 109, 0.25));
+	}
+
+	.lighthouse-tower svg {
+		width: 100%;
+		height: 100%;
+		display: block;
+	}
+
+	/* ===== Beam container =====
+	   bottom: 78px fixed pivot (no float when tower scales);
+	   left: 50% + translateX(-50%) centers on lens;
+	   transform-origin 50% 100% = rotation from lantern */
+	.beam {
+		position: absolute;
+		left: 50%;
+		bottom: 78px;
+		transform: translateX(-50%) translateY(12px);
+		transform-origin: 50% 100%;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		opacity: 0;
+		visibility: hidden;
+		pointer-events: none;
+		transition:
+			opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+			visibility 0.5s ease,
+			transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+	}
+
+	.lighthouse.shining .beam {
+		opacity: 1;
+		visibility: visible;
+		/* Entrance (once) + ongoing sweep */
+		animation:
+			beam-entrance 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards,
+			beam-sweep 8s 0.5s ease-in-out infinite;
+	}
+
+	@keyframes beam-entrance {
+		0% {
+			opacity: 0;
+			transform: translateX(-50%) translateY(12px) rotate(-7.5deg);
+		}
+		100% {
+			opacity: 1;
+			transform: translateX(-50%) translateY(0) rotate(-7.5deg);
+		}
+	}
+
+	@keyframes beam-sweep {
+		0%, 100% { transform: translateX(-50%) rotate(-7.5deg); }
+		50% { transform: translateX(-50%) rotate(7.5deg); }
+	}
+
+	/* ===== Beam light (radial gradient + clip-path) =====
+	   Cinematic: brightest at lantern source, fades to soft golden glow */
+	.beam-light {
+		width: 100px;
+		height: 140px;
+		clip-path: polygon(50% 100%, 0 0, 100% 0);
+		background: radial-gradient(
+			ellipse 80% 45% at 50% 100%,
+			rgba(255, 250, 220, 0.95) 0%,
+			rgba(255, 245, 200, 0.7) 15%,
+			rgba(255, 235, 170, 0.45) 35%,
+			rgba(255, 225, 140, 0.25) 55%,
+			rgba(255, 215, 120, 0.1) 75%,
+			transparent 95%
+		);
+		filter: blur(2px);
+	}
+
+	/* ===== Spotlight bubble (circle with text) =====
+	   clamp() ensures legible size while scaling down on smaller devices */
+	.beam-circle {
+		width: clamp(90px, 22vw, 130px);
+		height: clamp(90px, 22vw, 130px);
+		transform: translateY(-2px);
+		border-radius: 50%;
+		background: radial-gradient(
+			circle at 35% 35%,
+			rgba(255, 255, 255, 0.98) 0%,
+			rgba(255, 250, 235, 0.95) 30%,
+			rgba(255, 242, 215, 0.9) 60%,
+			rgba(255, 235, 200, 0.85) 100%
+		);
+		/* Subtle golden border */
+		border: 2px solid rgba(255, 218, 100, 0.6);
+		/* Glowing from within */
+		box-shadow:
+			0 0 60px rgba(255, 230, 109, 0.35),
+			0 0 30px rgba(255, 200, 100, 0.2),
+			inset 0 0 50px rgba(255, 248, 220, 0.5),
+			inset 0 0 30px rgba(255, 230, 109, 0.15),
+			0 4px 24px rgba(0, 0, 0, 0.08);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 1rem 1.25rem;
+	}
+
+	/* ===== Typography: premium festival/event look ===== */
+	.location-text {
+		font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+		font-size: clamp(0.7rem, 2vw, 0.9rem);
+		font-weight: 600;
+		color: var(--color-ink);
+		text-align: center;
+		line-height: 1.4;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		max-width: 12ch;
+	}
+
+	/* ===== Responsive ===== */
+	@media (max-width: 640px) {
+		.lighthouse-wrap {
+			width: 130px;
+			height: 110px;
+		}
+		.lighthouse-rock {
+			width: 130px;
+			height: 50px;
+		}
+		.lighthouse {
+			width: 40px;
+			height: 60px;
+			right: 32px;
+			bottom: 38px;
+		}
+		.beam {
+			bottom: 62px;
+		}
+		.beam-light {
+			width: 80px;
+			height: 110px;
+		}
+		.beam-circle {
+			width: clamp(80px, 20vw, 100px);
+			height: clamp(80px, 20vw, 100px);
+			padding: 0.65rem 0.85rem;
+		}
+		.location-text {
+			font-size: 0.78rem;
+			line-height: 1.4;
+			max-width: none;
+		}
+	}
+</style>

@@ -1,0 +1,340 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Surf Del Mar" description="Celebrating the sport and the culture. Preserving the stories and the spirit. Del Mar Historical Society Surfing Festival.">
+	<!-- Hero: full-screen with sunset/surfer background -->
+	<section class="hero-long" aria-label="Surf Del Mar Festival">
+		<div class="hero-long-overlay"></div>
+		<div class="hero-long-content">
+			<h1 class="hero-long-title">Surf Del Mar</h1>
+			<p class="hero-long-subtitle">FESTIVAL</p>
+			<div class="hero-long-divider"></div>
+			<p class="hero-long-tagline">Celebrating the Sport and the Culture</p>
+			<p class="hero-long-tagline">Preserving the Stories and the Spirit</p>
+		</div>
+	</section>
+
+	<!-- Reunion: two-column -->
+	<section class="reunion-section">
+		<div class="reunion-container">
+			<div class="reunion-col reunion-col-image">
+				<div class="reunion-poster-wrap">
+					<img src="/Poster.webp" alt="Surf Del Mar Festival poster by John Van Hamersveld" class="reunion-poster" width="600" height="900" />
+				</div>
+			</div>
+			<div class="reunion-col reunion-col-text">
+				<h2 class="reunion-heading">A Coastal Reunion</h2>
+				<p class="reunion-body">
+					Join us for a fun-filled Surfers Reunion in Del Mar that will bring generations together to celebrate the surfers, their memories, their creativity and their love of the sport.
+				</p>
+				<div class="calendar-callout">
+					<p class="calendar-callout-label">Mark Your Calendars</p>
+					<p class="calendar-callout-dates">Thursday, October 8th through Sunday, October 11th, 2026</p>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- Features: What to Look For -->
+	<section class="features-section">
+		<div class="features-container">
+			<h2 class="features-heading">Here's What to Look For</h2>
+			<ul class="features-list">
+				<li class="feature-item">
+					<span class="feature-badge" aria-hidden="true">1</span>
+					<p>Listen to the music of Peter Sprague and his group at the Del Mar Plaza, and the legendary Mar Dels at Powerhouse Park</p>
+				</li>
+				<li class="feature-item">
+					<span class="feature-badge" aria-hidden="true">2</span>
+					<p>Catch Some Surfing Flicks: Watch Bruce Brown's legendary film <em>Endless Summer</em> at Powerhouse Park, and a showing of local filmmakers' documentaries about the sport and the people who surf.</p>
+				</li>
+				<li class="feature-item">
+					<span class="feature-badge" aria-hidden="true">3</span>
+					<p>Stroll through a display of surfing artwork created by local artists and students from Del Mar Elementary schools, Earl Warren Middle School and Torrey Pines High School</p>
+				</li>
+				<li class="feature-item">
+					<span class="feature-badge" aria-hidden="true">4</span>
+					<p>Learn about surfing and sustainability, the invaluable work local researchers, top surfers, and surfboard manufacturers are doing to raise awareness of coastal challenges and climate change</p>
+				</li>
+				<li class="feature-item">
+					<span class="feature-badge" aria-hidden="true">5</span>
+					<p>Meet authors who have written about the sport and culture of surfing and have them sign your book at the Surfwriter's Book Fair</p>
+				</li>
+			</ul>
+		</div>
+	</section>
+
+	<!-- Final CTA -->
+	<section class="cta-section">
+		<a href="/schedule/" class="btn-schedule">VIEW FULL EVENT SCHEDULE</a>
+	</section>
+</BaseLayout>
+
+<style>
+	/* --- Coastal Vintage palette (use vars where existing) --- */
+	.hero-long {
+		position: relative;
+		min-height: 80vh;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background-color: #2c2419;
+		text-align: center;
+		color: var(--color-cream);
+		overflow: hidden;
+	}
+
+	.hero-long::before {
+		content: "";
+		position: absolute;
+		inset: 0;
+		background: url("/Poster.webp") center center / cover no-repeat;
+		filter: brightness(1.12);
+		z-index: 0;
+	}
+
+	.hero-long-overlay {
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(0deg, rgba(28,26,22,0.65) 0%, rgba(28,26,22,0.28) 50%, transparent 100%);
+		z-index: 1;
+		pointer-events: none;
+	}
+
+	.hero-long-content {
+		position: relative;
+		z-index: 2;
+		max-width: 720px;
+		padding: 2rem 1.5rem;
+	}
+
+	.hero-long-title {
+		font-family: var(--font-display);
+		font-size: clamp(3rem, 10vw, 5.5rem);
+		font-weight: 700;
+		letter-spacing: 0.02em;
+		margin: 0 0 0.25rem 0;
+		line-height: 1.05;
+		text-shadow: 0 2px 24px rgba(0,0,0,0.4);
+	}
+
+	.hero-long-subtitle {
+		font-family: var(--font-body);
+		font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+		font-weight: 600;
+		letter-spacing: 0.45em;
+		margin: 0 0 1.25rem 0;
+		opacity: 0.95;
+		text-shadow: 0 1px 12px rgba(0,0,0,0.3);
+	}
+
+	.hero-long-divider {
+		width: 120px;
+		height: 2px;
+		background: linear-gradient(90deg, transparent, rgba(255,255,255,0.7), transparent);
+		margin: 0 auto 1.5rem auto;
+	}
+
+	.hero-long-tagline {
+		font-family: var(--font-display);
+		font-size: clamp(1.1rem, 2.5vw, 1.35rem);
+		font-weight: 500;
+		margin: 0 0 0.35rem 0;
+		opacity: 0.95;
+		text-shadow: 0 1px 8px rgba(0,0,0,0.3);
+	}
+
+	/* --- Reunion two-column --- */
+	.reunion-section {
+		background: linear-gradient(180deg, #f5f1eb 0%, #e8e0d6 50%, #ddd4c8 100%);
+		padding: 4rem 2rem;
+	}
+
+	.reunion-container {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 3rem;
+		align-items: center;
+		max-width: 1100px;
+		margin: 0 auto;
+	}
+
+	@media (max-width: 768px) {
+		.reunion-container {
+			grid-template-columns: 1fr;
+			gap: 2rem;
+		}
+		.reunion-col-image {
+			order: 1;
+		}
+		.reunion-col-text {
+			order: 2;
+		}
+	}
+
+	.reunion-poster-wrap {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.reunion-poster {
+		width: 100%;
+		max-width: 420px;
+		height: auto;
+		display: block;
+		border-radius: 6px;
+		box-shadow: 0 20px 50px rgba(0,0,0,0.18), 0 8px 24px rgba(0,0,0,0.12);
+		transform: rotate(-2deg);
+		transition: transform 0.35s ease, box-shadow 0.35s ease;
+	}
+
+	.reunion-poster-wrap:hover .reunion-poster {
+		transform: rotate(0deg);
+		box-shadow: 0 24px 56px rgba(0,0,0,0.2);
+	}
+
+	.reunion-heading {
+		font-family: var(--font-display);
+		font-size: clamp(1.85rem, 4vw, 2.35rem);
+		font-weight: 600;
+		color: var(--color-ink);
+		margin: 0 0 1rem 0;
+		line-height: 1.2;
+	}
+
+	.reunion-body {
+		font-family: var(--font-body);
+		font-size: 1.1rem;
+		color: var(--color-ink);
+		line-height: 1.75;
+		margin: 0 0 1.5rem 0;
+		max-width: 48ch;
+	}
+
+	.calendar-callout {
+		background: rgba(255,255,255,0.5);
+		border-left: 4px solid #c9a227;
+		padding: 1.25rem 1.5rem;
+		border-radius: 0 10px 10px 0;
+		box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+	}
+
+	.calendar-callout-label {
+		font-family: var(--font-body);
+		font-size: 0.8rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.1em;
+		color: var(--color-sepia);
+		margin: 0 0 0.35rem 0;
+	}
+
+	.calendar-callout-dates {
+		font-family: var(--font-display);
+		font-size: 1.25rem;
+		font-weight: 600;
+		color: var(--color-ink);
+		margin: 0;
+		line-height: 1.35;
+	}
+
+	/* --- Features --- */
+	.features-section {
+		background: #e8e0d6;
+		padding: 4rem 2rem;
+	}
+
+	.features-container {
+		max-width: 780px;
+		margin: 0 auto;
+	}
+
+	.features-heading {
+		font-family: var(--font-display);
+		font-size: clamp(1.75rem, 4vw, 2.25rem);
+		font-weight: 600;
+		color: var(--color-ink);
+		text-align: center;
+		margin: 0 0 2rem 0;
+		line-height: 1.25;
+	}
+
+	.features-list {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 1.25rem;
+	}
+
+	.feature-item {
+		display: flex;
+		gap: 1rem;
+		align-items: flex-start;
+		background: rgba(255,255,255,0.45);
+		padding: 1.25rem 1.5rem;
+		border-radius: 12px;
+		border: 1px solid rgba(255,255,255,0.6);
+		box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+		transition: transform 0.25s ease, box-shadow 0.25s ease;
+	}
+
+	.feature-item:hover {
+		transform: translateX(6px);
+		box-shadow: 0 6px 24px rgba(0,0,0,0.08);
+	}
+
+	.feature-badge {
+		flex-shrink: 0;
+		width: 2rem;
+		height: 2rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: var(--color-ink);
+		color: var(--color-cream);
+		font-family: var(--font-body);
+		font-size: 0.8rem;
+		font-weight: 700;
+		border-radius: 50%;
+	}
+
+	.feature-item p {
+		font-family: var(--font-body);
+		font-size: 1rem;
+		color: var(--color-ink);
+		line-height: 1.7;
+		margin: 0;
+	}
+
+	/* --- Final CTA --- */
+	.cta-section {
+		background: linear-gradient(180deg, #ddd4c8 0%, #d2c8ba 100%);
+		padding: 4rem 2rem;
+		text-align: center;
+	}
+
+	.btn-schedule {
+		display: inline-block;
+		padding: 1rem 2.25rem;
+		font-family: var(--font-body);
+		font-size: 1rem;
+		font-weight: 700;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		text-decoration: none;
+		color: var(--color-cream);
+		background: var(--color-ink);
+		border-radius: 50px;
+		box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+		transition: transform 0.25s ease, box-shadow 0.25s ease;
+	}
+
+	.btn-schedule:hover {
+		transform: translateY(-3px);
+		box-shadow: 0 8px 28px rgba(0,0,0,0.2);
+	}
+</style>
