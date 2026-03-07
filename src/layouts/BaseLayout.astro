@@ -51,6 +51,11 @@ const { title, description = "Preserving and celebrating the history of Del Mar,
 							</div>
 						</li>
 						<li>
+							<div class="reunion-container">
+								<a href="/surfers-reunion/" class="nav-reunion"><span class="nav-reunion-text">Surfers Reunion</span></a>
+							</div>
+						</li>
+						<li>
 							<div class="schedule-container">
 								<a href="/schedule/" class="nav-schedule">
 									<span class="nav-schedule-paper">
@@ -260,9 +265,10 @@ const { title, description = "Preserving and celebrating the history of Del Mar,
 		color: var(--color-sepia);
 	}
 
-	/* Shared container baseline for Home, About Surf Del Mar, Schedule, and Sponsors */
+	/* Shared container baseline for Home, About Surf Del Mar, Surfers Reunion, Schedule, and Sponsors */
 	.tower-container,
 	.surf-container,
+	.reunion-container,
 	.schedule-container,
 	.sponsors-container {
 		position: relative;
@@ -273,6 +279,7 @@ const { title, description = "Preserving and celebrating the history of Del Mar,
 
 	.tower-container::after,
 	.surf-container::after,
+	.reunion-container::after,
 	.schedule-container::after,
 	.sponsors-container::after {
 		content: '';
@@ -291,6 +298,7 @@ const { title, description = "Preserving and celebrating the history of Del Mar,
 
 	.tower-container:hover::after,
 	.surf-container:hover::after,
+	.reunion-container:hover::after,
 	.schedule-container:hover::after,
 	.sponsors-container:hover::after {
 		opacity: 1;
@@ -344,6 +352,7 @@ const { title, description = "Preserving and celebrating the history of Del Mar,
 
 	.tower-container:hover .nav-tower,
 	.surf-container:hover .nav-surfboard,
+	.reunion-container:hover .nav-reunion,
 	.sponsors-container:hover .nav-sponsors {
 		transform: translateY(-5px);
 		animation: none;
@@ -454,6 +463,43 @@ const { title, description = "Preserving and celebrating the history of Del Mar,
 		.nav-schedule-text {
 			font-size: 0.55rem;
 		}
+	}
+
+	/* Surfers Reunion nav – wave ribbon / coastal badge */
+	.nav-reunion {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0.6rem 1.25rem 0.75rem;
+		min-width: 140px;
+		margin-bottom: 0;
+		position: relative;
+		z-index: 2;
+		text-transform: uppercase;
+		font-size: 0.65rem;
+		letter-spacing: 0.14em;
+		font-weight: 800;
+		color: var(--color-cream) !important;
+		text-decoration: none;
+		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+		transition: transform 0.4s var(--ease-coastal), box-shadow 0.4s var(--ease-coastal), filter 0.3s ease;
+		/* Wave crest shape: wavy bottom edge */
+		clip-path: polygon(0 0, 100% 0, 100% 100%, 92% 92%, 75% 100%, 50% 92%, 25% 100%, 8% 92%, 0 100%);
+		background: linear-gradient(135deg, var(--wave-deep) 0%, var(--wave-mid) 45%, var(--wave-light) 100%);
+		border: 1px solid rgba(26, 95, 122, 0.5);
+		box-shadow:
+			0 2px 8px rgba(26, 95, 122, 0.35),
+			inset 0 1px 0 rgba(255, 255, 255, 0.2);
+	}
+	.nav-reunion-text {
+		position: relative;
+		z-index: 2;
+	}
+	.reunion-container:hover .nav-reunion {
+		box-shadow:
+			0 6px 20px rgba(26, 95, 122, 0.45),
+			inset 0 1px 0 rgba(255, 255, 255, 0.25);
+		filter: brightness(1.08);
 	}
 
 	/* Sponsors nav – vintage badge / seal */
