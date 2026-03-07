@@ -3,7 +3,7 @@
  * Set PUBLIC_FIREBASE_* in .env and Netlify for this to work.
  */
 import { initializeApp, getApps, getApp, type FirebaseApp } from 'firebase/app';
-import { getFirestore, doc, getDoc, collection, getDocs, query, orderBy } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, collection, getDocs } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: import.meta.env.PUBLIC_FIREBASE_API_KEY,
@@ -55,19 +55,26 @@ export async function getSharedMemories(): Promise<SharedMemory[]> {
   try {
     const db = getFirestore(getFirebaseApp());
     const col = collection(db, 'sharedMemories');
-    const q = query(col, orderBy('submittedAt', 'desc'));
-    const snap = await getDocs(q);
-    return snap.docs.map((d) => {
+    const snap = await getDocs(col);
+    const list = snap.docs.map((d) => {
       const data = d.data();
+      const submittedAt = data.submittedAt ?? null;
       return {
         id: d.id,
         imageUrl: data.imageUrl ?? '',
         caption: data.caption ?? '',
         name: data.name ?? '',
-        submittedAt: data.submittedAt ?? null,
+        submittedAt,
       };
     });
-  } catch {
+    list.sort((a, b) => {
+      const sa = (a.submittedAt && 'seconds' in a.submittedAt) ? a.submittedAt.seconds : 0;
+      const sb = (b.submittedAt && 'seconds' in b.submittedAt) ? b.submittedAt.seconds : 0;
+      return sb - sa;
+    });
+    return list;
+  } catch (e) {
+    console.error('getSharedMemories failed:', e);
     return [];
   }
 }
