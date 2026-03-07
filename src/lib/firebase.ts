@@ -48,6 +48,7 @@ export interface SharedMemory {
   caption: string;
   name: string;
   submittedAt: { seconds: number } | null;
+  likes: number;
 }
 
 export type GetSharedMemoriesResult =
@@ -71,6 +72,7 @@ export async function getSharedMemories(): Promise<GetSharedMemoriesResult> {
         caption: String(data.caption ?? ''),
         name: String(data.name ?? ''),
         submittedAt,
+        likes: Number(data.likes ?? 0),
       };
     });
     list.sort((a, b) => {
