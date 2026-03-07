@@ -131,10 +131,15 @@ import Lighthouse from '../components/Lighthouse.astro';
 		async function renderMemories() {
 			if (!grid) return;
 			if (loadingEl) loadingEl.textContent = 'Loading…';
-			const memories = await getSharedMemories();
+			const result = await getSharedMemories();
 			if (loadingEl) loadingEl.remove();
+			if (!result.ok) {
+				grid.innerHTML = `<p class="shared-memories-msg shared-memories-error">Couldn't load memories. ${escapeHtml(result.error)} Check Netlify env vars (PUBLIC_FIREBASE_*) and that Firestore rules are deployed.</p>`;
+				return;
+			}
+			const memories = result.memories.filter((m) => m.imageUrl && m.imageUrl.startsWith('data:'));
 			if (memories.length === 0) {
-				grid.innerHTML = '<p class="shared-memories-msg">No memories yet. Be the first to share!</p>';
+				grid.innerHTML = '<p class="shared-memories-msg">No memories yet. Be the first to share! If you already submitted a photo, try sharing again—earlier submissions may not have been saved.</p>';
 				return;
 			}
 			grid.innerHTML = memories.map((m) => `
@@ -531,6 +536,12 @@ import Lighthouse from '../components/Lighthouse.astro';
 		font-style: italic;
 		grid-column: 1 / -1;
 		margin: 0;
+	}
+
+	.shared-memories-error {
+		font-style: normal;
+		color: var(--color-ink);
+		max-width: 48ch;
 	}
 
 	.shared-memory-card {

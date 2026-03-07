@@ -50,8 +50,14 @@ export interface SharedMemory {
   submittedAt: { seconds: number } | null;
 }
 
-export async function getSharedMemories(): Promise<SharedMemory[]> {
-  if (!import.meta.env.PUBLIC_FIREBASE_PROJECT_ID) return [];
+export type GetSharedMemoriesResult =
+  | { ok: true; memories: SharedMemory[] }
+  | { ok: false; error: string };
+
+export async function getSharedMemories(): Promise<GetSharedMemoriesResult> {
+  if (!import.meta.env.PUBLIC_FIREBASE_PROJECT_ID) {
+    return { ok: false, error: 'Firebase not configured (missing PUBLIC_FIREBASE_PROJECT_ID)' };
+  }
   try {
     const db = getFirestore(getFirebaseApp());
     const col = collection(db, 'sharedMemories');
@@ -61,20 +67,21 @@ export async function getSharedMemories(): Promise<SharedMemory[]> {
       const submittedAt = data.submittedAt ?? null;
       return {
         id: d.id,
-        imageUrl: data.imageUrl ?? '',
-        caption: data.caption ?? '',
-        name: data.name ?? '',
+        imageUrl: String(data.imageUrl ?? ''),
+        caption: String(data.caption ?? ''),
+        name: String(data.name ?? ''),
         submittedAt,
       };
     });
     list.sort((a, b) => {
-      const sa = (a.submittedAt && 'seconds' in a.submittedAt) ? a.submittedAt.seconds : 0;
-      const sb = (b.submittedAt && 'seconds' in b.submittedAt) ? b.submittedAt.seconds : 0;
+      const sa = (a.submittedAt && typeof (a.submittedAt as { seconds?: number }).seconds === 'number') ? (a.submittedAt as { seconds: number }).seconds : 0;
+      const sb = (b.submittedAt && typeof (b.submittedAt as { seconds?: number }).seconds === 'number') ? (b.submittedAt as { seconds: number }).seconds : 0;
       return sb - sa;
     });
-    return list;
+    return { ok: true, memories: list };
   } catch (e) {
+    const message = e instanceof Error ? e.message : String(e);
     console.error('getSharedMemories failed:', e);
-    return [];
+    return { ok: false, error: message };
   }
 }
