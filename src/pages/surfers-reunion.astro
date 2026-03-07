@@ -22,14 +22,21 @@ import Lighthouse from '../components/Lighthouse.astro';
 
 	<section class="reunion-content">
 		<div class="container">
-			<article class="event-card event-card-intro">
-				<p class="reunion-intro">
-					For decades, surfers have gathered along our local beaches to ride the waves, and share stories, building a unique coastal culture. SURF DEL MAR brings these generations together again.
-				</p>
-				<p class="reunion-intro">
-					From the pioneers who surfed here in the 1930s, like XXXXXXX, and into the 1950s and 60s, to today's surfers and young riders, this reunion invites everyone connected to Del Mar and the surrounding surf communities to come together and celebrate.
-				</p>
-			</article>
+			<div class="reunion-intro-grid">
+				<div class="reunion-intro-image-col">
+					<div class="reunion-surfers-wrap">
+						<img src="/surfers.jpg" alt="Surfers at Del Mar" class="reunion-surfers-img" width="600" height="400" />
+					</div>
+				</div>
+				<div class="reunion-intro-text-col">
+					<p class="reunion-intro">
+						For decades, surfers have gathered along our local beaches to ride the waves, and share stories, building a unique coastal culture. SURF DEL MAR brings these generations together again.
+					</p>
+					<p class="reunion-intro">
+						From the pioneers who surfed here in the 1930s, like XXXXXXX, and into the 1950s and 60s, to today's surfers and young riders, this reunion invites everyone connected to Del Mar and the surrounding surf communities to come together and celebrate.
+					</p>
+				</div>
+			</div>
 
 			<h2 class="reunion-subhead">REMEMBERING THE WAVES</h2>
 			<p class="reunion-lead">Throughout the SURF DEL MAR weekend, reunion events will include;</p>
@@ -134,6 +141,53 @@ import Lighthouse from '../components/Lighthouse.astro';
 	.reunion-content .container {
 		max-width: 820px;
 		margin: 0 auto;
+	}
+
+	.reunion-intro-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 3rem;
+		align-items: center;
+		margin-bottom: 2.5rem;
+	}
+
+	@media (max-width: 768px) {
+		.reunion-intro-grid {
+			grid-template-columns: 1fr;
+			gap: 2rem;
+		}
+		.reunion-intro-image-col {
+			order: 1;
+		}
+		.reunion-intro-text-col {
+			order: 2;
+		}
+	}
+
+	.reunion-surfers-wrap {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.reunion-surfers-img {
+		width: 100%;
+		max-width: 380px;
+		height: auto;
+		display: block;
+		border-radius: 6px;
+		box-shadow: 0 20px 50px rgba(0,0,0,0.18), 0 8px 24px rgba(0,0,0,0.12);
+		transform: rotate(-2deg);
+		transition: transform 0.35s ease, box-shadow 0.35s ease;
+	}
+
+	.reunion-surfers-wrap:hover .reunion-surfers-img {
+		transform: rotate(0deg);
+		box-shadow: 0 24px 56px rgba(0,0,0,0.2);
+	}
+
+	.reunion-intro-text-col .reunion-intro {
+		margin-top: 0;
 	}
 
 	.reunion-intro {
