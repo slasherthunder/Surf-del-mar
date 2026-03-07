@@ -5,6 +5,16 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 <BaseLayout title="Surf Del Mar" description="Celebrating the sport and the culture. Preserving the stories and the spirit. Del Mar Historical Society Surfing Festival.">
 	<!-- Hero: full-screen with sunset/surfer background -->
 	<section class="hero-long" aria-label="Surf Del Mar Festival">
+		<img
+			src="/surfdelmar.png"
+			alt=""
+			class="hero-long-bg"
+			width="1200"
+			height="800"
+			fetchpriority="high"
+			data-original-src="/surfdelmar.png"
+			onerror="this.onerror=null;this.src=this.getAttribute('data-original-src')||'/surfdelmar.png';"
+		/>
 		<div class="hero-long-overlay"></div>
 		<div class="hero-long-content">
 			<h1 class="hero-long-title">Surf Del Mar</h1>
@@ -24,14 +34,14 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 				</div>
 			</div>
 			<div class="reunion-col reunion-col-text">
-				<h2 class="reunion-heading">A Coastal Reunion</h2>
 				<p class="reunion-body">
-					Join us for a fun-filled Surfers Reunion in Del Mar that will bring generations together to celebrate the surfers, their memories, their creativity and their love of the sport.
+					SURF DEL MAR is more than a festival—it's a Reunion, decades in the making. It brings together generations of surfers, storytellers, artists, musicians, authors and filmmakers for a one-of-a-kind event celebrating the sport, the culture, the legacy and the surfing history of Del Mar and the surrounding communities.
 				</p>
+				<p class="reunion-join">JOIN US OVER FOUR UNFORGETTABLE DAYS</p>
 				<div class="calendar-callout">
-					<p class="calendar-callout-label">Mark Your Calendars</p>
-					<p class="calendar-callout-dates">Thursday, October 8th through Sunday, October 11th, 2026</p>
+					<p class="calendar-callout-dates">October 8–11, 2026 – Del Mar, California</p>
 				</div>
+				<p class="reunion-tagline">Come Be A Part Of The History and The Fun When Surfers Come Together Again</p>
 			</div>
 		</div>
 	</section>
@@ -85,11 +95,13 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 		overflow: hidden;
 	}
 
-	.hero-long::before {
-		content: "";
+	.hero-long-bg {
 		position: absolute;
 		inset: 0;
-		background: url("/surfdelmar.png") center center / cover no-repeat;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: center center;
 		filter: brightness(1.12);
 		z-index: 0;
 	}
@@ -211,6 +223,27 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 		line-height: 1.75;
 		margin: 0 0 1.5rem 0;
 		max-width: 48ch;
+	}
+
+	.reunion-join {
+		font-family: var(--font-body);
+		font-size: 0.95rem;
+		font-weight: 700;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--color-ink);
+		margin: 0 0 1rem 0;
+		line-height: 1.4;
+	}
+
+	.reunion-tagline {
+		font-family: var(--font-display);
+		font-size: 1.15rem;
+		font-weight: 600;
+		color: var(--color-ink);
+		line-height: 1.45;
+		margin: 1.25rem 0 0 0;
+		max-width: 42ch;
 	}
 
 	.calendar-callout {
