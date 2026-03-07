@@ -131,10 +131,7 @@ import Lighthouse from '../components/Lighthouse.astro';
 		const lightboxClose = document.getElementById('memory-lightbox-close');
 
 		let memoriesList: SharedMemory[] = [];
-
-		function randomRotation() {
-			return (Math.random() * 6 - 3).toFixed(2);
-		}
+		let currentSlideIndex = 0;
 
 		function openModal() {
 			if (modal) modal.hidden = false;
@@ -174,58 +171,80 @@ import Lighthouse from '../components/Lighthouse.astro';
 				containerEl.innerHTML = '<p class="shared-memories-msg">No memories yet. Be the first to share! If you already submitted a photo, try sharing again—earlier submissions may not have been saved.</p>';
 				return;
 			}
-			const gridHtml = `
-				<div class="memories-grid memories-grid-corkboard">
-					${memoriesList.map((m) => {
-						const rot = randomRotation();
-						return `
-						<article class="polaroid-card" style="--polaroid-rotate: ${rot}deg">
-							<div class="polaroid-tape" aria-hidden="true"></div>
-							<button type="button" class="polaroid-img-wrap" data-lightbox-src="${escapeHtml(m.imageUrl)}" data-lightbox-alt="${escapeHtml(m.caption || 'Shared memory')}">
-								<img src="${m.imageUrl}" alt="${escapeHtml(m.caption || 'Shared memory')}" class="polaroid-img" loading="lazy" />
+			currentSlideIndex = 0;
+			renderSlide();
+		}
+
+		function renderSlide() {
+			if (!containerEl || memoriesList.length === 0) return;
+			const m = memoriesList[currentSlideIndex];
+			const total = memoriesList.length;
+			const rot = (Math.random() * 4 - 2).toFixed(2);
+
+			containerEl.innerHTML = `
+				<div class="memories-grid-corkboard">
+					<div class="slideshow-inner">
+						<button type="button" class="slideshow-nav slideshow-prev" aria-label="Previous memory">‹</button>
+
+						<article class="polaroid-card fade-in" style="--polaroid-rotate: ${rot}deg">
+							<button type="button" class="polaroid-img-wrap" id="zoom-trigger">
+								<img src="${m.imageUrl}" alt="${escapeHtml(m.caption || 'Shared memory')}" class="polaroid-img" />
 							</button>
-							<div class="polaroid-like-wrap">
+
+							<div class="polaroid-caption-area">
+								<p class="polaroid-caption">${m.caption ? escapeHtml(m.caption) : 'A beautiful day at Del Mar.'}</p>
+								${m.name ? `<p class="polaroid-name">— ${escapeHtml(m.name)}</p>` : ''}
+							</div>
+
+							<div class="polaroid-footer">
 								<button type="button" class="polaroid-like-sticker memory-like-btn" data-memory-id="${escapeHtml(m.id)}" aria-label="Like this memory">
 									<span class="memory-like-icon" aria-hidden="true">♥</span>
 									<span class="memory-like-count">${m.likes}</span>
 								</button>
 							</div>
-							<div class="polaroid-caption">${m.caption ? escapeHtml(m.caption) : ''}</div>
-							${m.name ? `<div class="polaroid-name">— ${escapeHtml(m.name)}</div>` : ''}
-						</article>`;
-					}).join('')}
+						</article>
+
+						<button type="button" class="slideshow-nav slideshow-next" aria-label="Next memory">›</button>
+					</div>
+
+					<div class="slideshow-pagination">
+						<span class="current">${currentSlideIndex + 1}</span> / <span class="total">${total}</span>
+					</div>
 				</div>
 			`;
-			containerEl.innerHTML = gridHtml;
 
-			containerEl.querySelectorAll('.polaroid-img-wrap').forEach((btn) => {
-				btn.addEventListener('click', () => {
-					const src = btn.getAttribute('data-lightbox-src');
-					const alt = btn.getAttribute('data-lightbox-alt') || '';
-					if (src) openLightbox(src, alt);
-				});
+			containerEl.querySelector('.slideshow-prev')?.addEventListener('click', () => {
+				currentSlideIndex = (currentSlideIndex - 1 + total) % total;
+				renderSlide();
+			});
+			containerEl.querySelector('.slideshow-next')?.addEventListener('click', () => {
+				currentSlideIndex = (currentSlideIndex + 1) % total;
+				renderSlide();
 			});
 
-			containerEl.querySelectorAll('.memory-like-btn').forEach((btn) => {
-				btn.addEventListener('click', async (e) => {
-					e.stopPropagation();
-					const el = e.currentTarget as HTMLElement;
-					const id = el.getAttribute('data-memory-id');
-					if (!id) return;
-					el.setAttribute('disabled', '');
-					try {
-						const res = await fetch(LIKE_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ memoryId: id }) });
-						const data = await res.json().catch(() => ({}));
-						if (res.ok && typeof data.likes === 'number') {
-							const mem = memoriesList.find((x) => x.id === id);
-							if (mem) mem.likes = data.likes;
-							const countEl = el.querySelector('.memory-like-count');
-							if (countEl) countEl.textContent = String(data.likes);
-						}
-					} finally {
-						el.removeAttribute('disabled');
+			containerEl.querySelector('#zoom-trigger')?.addEventListener('click', () => {
+				openLightbox(m.imageUrl, m.caption || 'Shared memory');
+			});
+
+			const likeBtn = containerEl.querySelector('.memory-like-btn');
+			likeBtn?.addEventListener('click', async (e) => {
+				e.stopPropagation();
+				const el = e.currentTarget as HTMLElement;
+				const id = el.getAttribute('data-memory-id');
+				if (!id || el.hasAttribute('disabled')) return;
+				el.setAttribute('disabled', '');
+				try {
+					const res = await fetch(LIKE_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ memoryId: id }) });
+					const data = await res.json().catch(() => ({}));
+					if (res.ok && typeof data.likes === 'number') {
+						const mem = memoriesList.find((x) => x.id === id);
+						if (mem) mem.likes = data.likes;
+						const countEl = el.querySelector('.memory-like-count');
+						if (countEl) countEl.textContent = String(data.likes);
 					}
-				});
+				} finally {
+					el.removeAttribute('disabled');
+				}
 			});
 		}
 
@@ -625,101 +644,151 @@ import Lighthouse from '../components/Lighthouse.astro';
 		max-width: 48ch;
 	}
 
-	/* Corkboard masonry grid */
+	/* Gallery wall: warm linen texture + spotlight */
 	.memories-grid-corkboard {
-		background: linear-gradient(180deg, #8b6914 0%, #6b4a0a 100%);
+		position: relative;
+		background-color: #ebe4d8;
 		background-image:
-			repeating-linear-gradient(
-				90deg,
-				transparent,
-				transparent 2px,
-				rgba(0,0,0,0.03) 2px,
-				rgba(0,0,0,0.03) 4px
-			),
-			linear-gradient(180deg, #9a7b2e 0%, #7a5a1a 100%);
-		padding: 2rem 1rem 3rem;
-		border-radius: 8px;
-		box-shadow: inset 0 2px 20px rgba(0,0,0,0.2), 0 4px 24px rgba(0,0,0,0.15);
+			radial-gradient(ellipse 90% 70% at 50% 40%, rgba(255, 252, 248, 0.95) 0%, rgba(255, 250, 242, 0.6) 40%, transparent 70%),
+			repeating-linear-gradient(0deg, transparent 0px, transparent 1px, rgba(0,0,0,0.015) 1px, rgba(0,0,0,0.015) 2px),
+			repeating-linear-gradient(90deg, transparent 0px, transparent 1px, rgba(0,0,0,0.012) 1px, rgba(0,0,0,0.012) 2px);
+		background-size: 100% 100%, 8px 8px, 8px 8px;
+		padding: 3rem 1rem 4rem;
+		border-radius: 12px;
+		border: 1px solid rgba(0,0,0,0.06);
+		box-shadow: inset 0 0 80px rgba(0,0,0,0.04), 0 6px 24px rgba(0,0,0,0.1);
+		overflow: visible;
 	}
 
-	.memories-grid {
-		column-count: 1;
-		column-gap: 1rem;
+	/* Main carousel: centered, card is the star */
+	.slideshow-inner {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 2.5rem;
+		max-width: 900px;
 		margin: 0 auto;
-		max-width: 600px;
+		padding: 2.5rem 1rem;
+		perspective: 1000px;
+		position: relative;
 	}
 
-	@media (min-width: 480px) {
-		.memories-grid {
-			column-count: 2;
-		}
-	}
-
-	@media (min-width: 768px) {
-		.memories-grid {
-			column-count: 3;
-		}
-	}
-
-	/* Polaroid card */
+	/* Polaroid card: thick white border, classic focus */
 	.polaroid-card {
 		position: relative;
-		break-inside: avoid;
-		margin-bottom: 1rem;
-		transform: rotate(var(--polaroid-rotate, 0deg));
-		transition: transform 0.25s ease;
+		background: #fff;
+		padding: 1.5rem 1.5rem 1rem;
+		box-shadow:
+			0 2px 4px rgba(0,0,0,0.08),
+			0 20px 45px rgba(0,0,0,0.12),
+			0 8px 20px rgba(0,0,0,0.06);
+		border-radius: 2px;
+		width: 100%;
+		max-width: 450px;
+		transform: rotate(var(--polaroid-rotate, -1deg));
+		transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+		border: 3px solid #fff;
+		outline: 1px solid rgba(0,0,0,0.06);
 	}
 
 	.polaroid-card:hover {
-		transform: rotate(var(--polaroid-rotate, 0deg)) scale(1.02);
+		transform: rotate(var(--polaroid-rotate, -1deg)) scale(1.02);
 	}
 
-	.polaroid-card {
-		display: inline-block;
-		width: 100%;
-		max-width: 200px;
-		background: #faf8f5;
-		padding: 0.4rem 0.4rem 0.85rem;
-		box-shadow:
-			0 3px 5px rgba(0,0,0,0.07),
-			0 8px 16px rgba(0,0,0,0.12);
-		border: 1px solid rgba(0,0,0,0.06);
-	}
-
-	/* Scotch tape at top */
-	.polaroid-tape::before {
+	/* Scotch tape: pseudo-element at top of card */
+	.polaroid-card::before {
 		content: '';
 		position: absolute;
-		top: -3px;
+		top: -12px;
 		left: 50%;
-		transform: translateX(-50%) rotate(-3deg);
-		width: 60%;
-		height: 16px;
-		background: linear-gradient(180deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.35) 50%, rgba(255,255,255,0.2) 100%);
-		box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-		z-index: 1;
+		transform: translateX(-50%) rotate(-2.5deg);
+		width: 110px;
+		height: 28px;
+		background: rgba(255, 255, 255, 0.5);
+		backdrop-filter: blur(3px);
+		-webkit-backdrop-filter: blur(3px);
+		box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+		z-index: 5;
 		pointer-events: none;
 	}
 
-	.polaroid-like-wrap {
-		text-align: center;
-		margin-top: 0.35rem;
+	/* Photo frame */
+	.polaroid-img-wrap {
+		width: 100%;
+		aspect-ratio: 1 / 1;
+		overflow: hidden;
+		background: #222;
+		border: 1px solid rgba(0,0,0,0.05);
+		display: block;
+		cursor: zoom-in;
+		padding: 0;
 	}
 
-	/* Like sticker below image */
+	.polaroid-img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+		filter: sepia(5%) contrast(105%);
+	}
+
+	/* Caption well: postcard-style with paper grain and dashed border */
+	.polaroid-caption-area {
+		margin-top: 1.5rem;
+		padding: 1.35rem 1.25rem;
+		background-color: #faf8f4;
+		background-image:
+			repeating-linear-gradient(0deg, transparent 0, transparent 2px, rgba(0,0,0,0.02) 2px, rgba(0,0,0,0.02) 3px),
+			repeating-linear-gradient(90deg, transparent 0, transparent 2px, rgba(0,0,0,0.02) 2px, rgba(0,0,0,0.02) 3px);
+		background-size: 6px 6px, 6px 6px;
+		border: 1px solid rgba(0,0,0,0.04);
+		border-top: 2px dashed rgba(0,0,0,0.18);
+		border-radius: 2px;
+		min-height: 120px;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+	}
+
+	.polaroid-caption {
+		font-family: 'Kalam', cursive;
+		font-size: 1.35rem;
+		line-height: 1.45;
+		color: #2c2c2c;
+		text-align: center;
+		margin: 0;
+		font-weight: 500;
+	}
+
+	.polaroid-name {
+		font-family: 'Kalam', cursive;
+		font-size: 0.85rem;
+		font-weight: 600;
+		color: var(--wave-deep);
+		margin-top: 0.65rem;
+		margin-bottom: 0;
+		text-align: center;
+		letter-spacing: 0.02em;
+	}
+
+	.polaroid-footer {
+		display: flex;
+		justify-content: center;
+		padding-top: 0.75rem;
+	}
+
 	.polaroid-like-sticker {
 		display: inline-flex;
 		align-items: center;
-		gap: 0.15rem;
-		margin: 0;
-		padding: 0.2rem 0.4rem;
+		gap: 0.25rem;
+		padding: 0.3rem 0.6rem;
 		border: none;
 		border-radius: 4px;
 		background: rgba(255, 240, 245, 0.95);
 		box-shadow: 0 1px 3px rgba(0,0,0,0.15);
 		color: #c53030;
 		font-family: 'Kalam', cursive;
-		font-size: 0.75rem;
+		font-size: 0.85rem;
 		font-weight: 700;
 		cursor: pointer;
 		transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -736,7 +805,7 @@ import Lighthouse from '../components/Lighthouse.astro';
 	}
 
 	.memory-like-icon {
-		font-size: 0.85rem;
+		font-size: 1rem;
 		line-height: 1;
 	}
 
@@ -744,47 +813,64 @@ import Lighthouse from '../components/Lighthouse.astro';
 		min-width: 1.25ch;
 	}
 
-	/* Clickable image area – square Polaroid frame */
-	.polaroid-img-wrap {
-		display: block;
-		width: 100%;
+	/* Fade-in when changing slides */
+	.polaroid-card.fade-in {
+		animation: slide-appear 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+	}
+
+	@keyframes slide-appear {
+		from { opacity: 0; transform: scale(0.96) rotate(0deg); }
+		to { opacity: 1; transform: scale(1) rotate(var(--polaroid-rotate, -1deg)); }
+	}
+
+	/* Nav: large circular buttons floating off the wall */
+	.slideshow-nav {
+		width: 56px;
+		height: 56px;
+		border-radius: 50%;
+		background: #fff;
+		border: 2px solid rgba(0,0,0,0.08);
+		box-shadow: 0 6px 20px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.06);
+		font-size: 2rem;
+		line-height: 1;
+		color: var(--wave-deep);
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: transform 0.2s ease, color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+		z-index: 10;
+		flex-shrink: 0;
 		padding: 0;
-		border: none;
-		background: transparent;
-		cursor: zoom-in;
-		position: relative;
-		overflow: hidden;
-		aspect-ratio: 1;
-		margin-bottom: 0.35rem;
 	}
 
-	.polaroid-img {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-		display: block;
-		transition: transform 0.3s ease;
+	.slideshow-nav:hover:not(:disabled) {
+		transform: scale(1.1);
+		background: var(--wave-deep);
+		color: #fff;
+		box-shadow: 0 8px 24px rgba(0,0,0,0.18);
 	}
 
-	.polaroid-img-wrap:hover .polaroid-img {
-		transform: scale(1.03);
+	.slideshow-nav:disabled {
+		opacity: 0.35;
+		cursor: not-allowed;
 	}
 
-	/* Handwriting font for caption */
-	.polaroid-caption,
-	.polaroid-name {
+	/* Pagination: handwritten note in corner of wall */
+	.slideshow-pagination {
+		position: absolute;
+		bottom: 1rem;
+		right: 1.25rem;
 		font-family: 'Kalam', cursive;
-		font-size: 0.8rem;
-		color: var(--color-ink);
-		line-height: 1.35;
-		margin: 0;
-		padding: 0 0.2rem;
+		font-size: 1rem;
+		font-weight: 600;
+		color: var(--color-sepia);
+		opacity: 0.85;
+		letter-spacing: 0.02em;
 	}
 
-	.polaroid-name {
-		font-size: 0.7rem;
-		color: var(--color-sepia);
-		margin-top: 0.15rem;
+	.slideshow-pagination .current {
+		color: var(--wave-deep);
 	}
 
 	/* Lightbox */
