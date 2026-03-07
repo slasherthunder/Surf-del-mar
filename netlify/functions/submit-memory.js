@@ -25,13 +25,21 @@ exports.handler = async (event, context) => {
   if (!imageBase64) {
     return { statusCode: 400, body: JSON.stringify({ error: 'imageBase64 is required' }) };
   }
+  // Firestore document limit 1MB; data URL = prefix + base64 (base64 ~4/3 of binary)
+  const dataUrl = `data:${contentType || 'image/jpeg'};base64,${imageBase64}`;
+  const approxDocSize = dataUrl.length + (String(caption).length + String(name).length) + 100;
+  if (approxDocSize > 1024 * 1024) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: 'Image is too large. Please choose a smaller photo and try again.' }),
+    };
+  }
   try {
-    const dataUrl = `data:${contentType || 'image/jpeg'};base64,${imageBase64}`;
     const app = getAdmin();
     const db = app.firestore();
     const ref = db.collection('sharedMemories').doc();
     await ref.set({
-      imageUrl: dataUrl,
+      imageUrl: dataUrl, // keep under 1MB total doc size
       caption: String(caption).trim().slice(0, 1000),
       name: String(name).trim().slice(0, 200),
       submittedAt: admin.firestore.FieldValue.serverTimestamp(),
