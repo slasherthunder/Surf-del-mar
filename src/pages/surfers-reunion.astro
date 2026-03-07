@@ -110,7 +110,6 @@ import Lighthouse from '../components/Lighthouse.astro';
 		import type { SharedMemory } from '../lib/firebase';
 
 		const SUBMIT_URL = '/.netlify/functions/submit-memory';
-		const LIKE_URL = '/.netlify/functions/like-memory';
 		// Firestore doc limit 1MB; base64 is ~4/3 of binary so keep binary ≤ ~700KB
 		const MAX_IMAGE_SIZE = 700 * 1024;
 		const MAX_DIMENSION = 1200; // max width or height before upload
@@ -184,32 +183,21 @@ import Lighthouse from '../components/Lighthouse.astro';
 			containerEl.innerHTML = `
 				<div class="memories-grid-corkboard">
 					<div class="slideshow-inner">
-						<button type="button" class="slideshow-nav slideshow-prev" aria-label="Previous memory">‹</button>
+						<button type="button" class="slideshow-nav slideshow-prev" aria-label="Previous">‹</button>
 
-						<article class="polaroid-card fade-in" style="--polaroid-rotate: ${rot}deg">
+						<article class="polaroid-card fade-in-up" style="--polaroid-rotate: ${rot}deg">
 							<button type="button" class="polaroid-img-wrap" id="zoom-trigger">
-								<img src="${m.imageUrl}" alt="${escapeHtml(m.caption || 'Shared memory')}" class="polaroid-img" />
+								<img src="${m.imageUrl}" alt="Memory" class="polaroid-img" />
 							</button>
-
-							<div class="polaroid-caption-area">
-								<p class="polaroid-caption">${m.caption ? escapeHtml(m.caption) : 'A beautiful day at Del Mar.'}</p>
+							<div class="polaroid-caption-well">
+								<p class="polaroid-caption">${m.caption ? escapeHtml(m.caption) : 'Del Mar Waves.'}</p>
 								${m.name ? `<p class="polaroid-name">— ${escapeHtml(m.name)}</p>` : ''}
-							</div>
-
-							<div class="polaroid-footer">
-								<button type="button" class="polaroid-like-sticker memory-like-btn" data-memory-id="${escapeHtml(m.id)}" aria-label="Like this memory">
-									<span class="memory-like-icon" aria-hidden="true">♥</span>
-									<span class="memory-like-count">${m.likes}</span>
-								</button>
 							</div>
 						</article>
 
-						<button type="button" class="slideshow-nav slideshow-next" aria-label="Next memory">›</button>
+						<button type="button" class="slideshow-nav slideshow-next" aria-label="Next">›</button>
 					</div>
-
-					<div class="slideshow-pagination">
-						<span class="current">${currentSlideIndex + 1}</span> / <span class="total">${total}</span>
-					</div>
+					<div class="slideshow-pagination">${currentSlideIndex + 1} / ${total}</div>
 				</div>
 			`;
 
@@ -221,30 +209,8 @@ import Lighthouse from '../components/Lighthouse.astro';
 				currentSlideIndex = (currentSlideIndex + 1) % total;
 				renderSlide();
 			});
-
 			containerEl.querySelector('#zoom-trigger')?.addEventListener('click', () => {
 				openLightbox(m.imageUrl, m.caption || 'Shared memory');
-			});
-
-			const likeBtn = containerEl.querySelector('.memory-like-btn');
-			likeBtn?.addEventListener('click', async (e) => {
-				e.stopPropagation();
-				const el = e.currentTarget as HTMLElement;
-				const id = el.getAttribute('data-memory-id');
-				if (!id || el.hasAttribute('disabled')) return;
-				el.setAttribute('disabled', '');
-				try {
-					const res = await fetch(LIKE_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ memoryId: id }) });
-					const data = await res.json().catch(() => ({}));
-					if (res.ok && typeof data.likes === 'number') {
-						const mem = memoriesList.find((x) => x.id === id);
-						if (mem) mem.likes = data.likes;
-						const countEl = el.querySelector('.memory-like-count');
-						if (countEl) countEl.textContent = String(data.likes);
-					}
-				} finally {
-					el.removeAttribute('disabled');
-				}
 			});
 		}
 
@@ -627,211 +593,146 @@ import Lighthouse from '../components/Lighthouse.astro';
 		margin-top: 3rem;
 	}
 
-	.shared-memories-container {
+	/* Shared Memories: styles must be :global() so they apply to JS-injected HTML */
+	:global(.shared-memories-container) {
+		display: flex;
+		justify-content: center;
+		align-items: center;
 		margin-top: 1rem;
+		width: 100%;
 	}
 
-	.shared-memories-msg {
+	:global(.shared-memories-msg) {
 		font-family: var(--font-body);
 		color: var(--color-sepia);
 		font-style: italic;
 		margin: 0;
 	}
 
-	.shared-memories-error {
+	:global(.shared-memories-error) {
 		font-style: normal;
 		color: var(--color-ink);
 		max-width: 48ch;
 	}
 
-	/* Gallery wall: warm linen texture + spotlight */
-	.memories-grid-corkboard {
+	:global(.memories-grid-corkboard) {
 		position: relative;
-		background-color: #ebe4d8;
+		width: 100%;
+		min-height: 600px;
+		background-color: #f4f1ea;
 		background-image:
-			radial-gradient(ellipse 90% 70% at 50% 40%, rgba(255, 252, 248, 0.95) 0%, rgba(255, 250, 242, 0.6) 40%, transparent 70%),
-			repeating-linear-gradient(0deg, transparent 0px, transparent 1px, rgba(0,0,0,0.015) 1px, rgba(0,0,0,0.015) 2px),
-			repeating-linear-gradient(90deg, transparent 0px, transparent 1px, rgba(0,0,0,0.012) 1px, rgba(0,0,0,0.012) 2px);
-		background-size: 100% 100%, 8px 8px, 8px 8px;
+			repeating-linear-gradient(0deg, transparent 0px, transparent 1px, rgba(0,0,0,0.02) 1px, rgba(0,0,0,0.02) 2px),
+			repeating-linear-gradient(90deg, transparent 0px, transparent 1px, rgba(0,0,0,0.02) 1px, rgba(0,0,0,0.02) 2px);
+		background-size: 12px 12px, 12px 12px;
 		padding: 3rem 1rem 4rem;
 		border-radius: 12px;
 		border: 1px solid rgba(0,0,0,0.06);
-		box-shadow: inset 0 0 80px rgba(0,0,0,0.04), 0 6px 24px rgba(0,0,0,0.1);
+		box-shadow: inset 0 0 60px rgba(0,0,0,0.03), 0 4px 20px rgba(0,0,0,0.08);
 		overflow: visible;
 	}
 
-	/* Main carousel: centered, card is the star */
-	.slideshow-inner {
+	:global(.slideshow-inner) {
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		gap: 2.5rem;
-		max-width: 900px;
+		max-width: 960px;
 		margin: 0 auto;
-		padding: 2.5rem 1rem;
-		perspective: 1000px;
+		padding: 2rem 1rem;
 		position: relative;
 	}
 
-	/* Polaroid card: thick white border, classic focus */
-	.polaroid-card {
+	:global(.polaroid-card) {
 		position: relative;
 		background: #fff;
-		padding: 1.5rem 1.5rem 1rem;
-		box-shadow:
-			0 2px 4px rgba(0,0,0,0.08),
-			0 20px 45px rgba(0,0,0,0.12),
-			0 8px 20px rgba(0,0,0,0.06);
+		padding: 1.5rem;
+		box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 10px 25px rgba(0,0,0,0.15);
 		border-radius: 2px;
 		width: 100%;
-		max-width: 450px;
+		max-width: 400px;
+		margin: 0 auto;
 		transform: rotate(var(--polaroid-rotate, -1deg));
-		transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-		border: 3px solid #fff;
-		outline: 1px solid rgba(0,0,0,0.06);
+		transition: transform 0.35s ease;
 	}
 
-	.polaroid-card:hover {
+	:global(.polaroid-card:hover) {
 		transform: rotate(var(--polaroid-rotate, -1deg)) scale(1.02);
 	}
 
-	/* Scotch tape: pseudo-element at top of card */
-	.polaroid-card::before {
-		content: '';
-		position: absolute;
-		top: -12px;
-		left: 50%;
-		transform: translateX(-50%) rotate(-2.5deg);
-		width: 110px;
-		height: 28px;
-		background: rgba(255, 255, 255, 0.5);
-		backdrop-filter: blur(3px);
-		-webkit-backdrop-filter: blur(3px);
-		box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-		z-index: 5;
-		pointer-events: none;
-	}
-
-	/* Photo frame */
-	.polaroid-img-wrap {
+	:global(.polaroid-img-wrap) {
 		width: 100%;
 		aspect-ratio: 1 / 1;
 		overflow: hidden;
 		background: #222;
-		border: 1px solid rgba(0,0,0,0.05);
+		border: none;
 		display: block;
 		cursor: zoom-in;
 		padding: 0;
+		margin: 0;
 	}
 
-	.polaroid-img {
+	:global(.polaroid-img) {
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
 		display: block;
-		filter: sepia(5%) contrast(105%);
+		filter: sepia(8%) contrast(105%);
 	}
 
-	/* Caption well: postcard-style with paper grain and dashed border */
-	.polaroid-caption-area {
-		margin-top: 1.5rem;
-		padding: 1.35rem 1.25rem;
-		background-color: #faf8f4;
-		background-image:
-			repeating-linear-gradient(0deg, transparent 0, transparent 2px, rgba(0,0,0,0.02) 2px, rgba(0,0,0,0.02) 3px),
-			repeating-linear-gradient(90deg, transparent 0, transparent 2px, rgba(0,0,0,0.02) 2px, rgba(0,0,0,0.02) 3px);
-		background-size: 6px 6px, 6px 6px;
-		border: 1px solid rgba(0,0,0,0.04);
-		border-top: 2px dashed rgba(0,0,0,0.18);
-		border-radius: 2px;
-		min-height: 120px;
+	:global(.polaroid-caption-well) {
+		margin-top: 1.25rem;
+		padding: 1rem 1rem;
+		background: #fdfcf9;
+		border-top: 2px dashed rgba(0,0,0,0.2);
+		border-radius: 0 0 2px 2px;
+		min-height: 80px;
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
 	}
 
-	.polaroid-caption {
+	:global(.polaroid-caption) {
 		font-family: 'Kalam', cursive;
-		font-size: 1.35rem;
-		line-height: 1.45;
-		color: #2c2c2c;
+		font-size: 1.2rem;
+		line-height: 1.4;
+		color: #333;
 		text-align: center;
 		margin: 0;
-		font-weight: 500;
 	}
 
-	.polaroid-name {
+	:global(.polaroid-name) {
 		font-family: 'Kalam', cursive;
-		font-size: 0.85rem;
+		font-size: 0.8rem;
 		font-weight: 600;
 		color: var(--wave-deep);
-		margin-top: 0.65rem;
+		margin-top: 0.5rem;
 		margin-bottom: 0;
 		text-align: center;
-		letter-spacing: 0.02em;
 	}
 
-	.polaroid-footer {
-		display: flex;
-		justify-content: center;
-		padding-top: 0.75rem;
+	:global(.polaroid-card.fade-in-up) {
+		animation: polaroid-fade-in-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 	}
 
-	.polaroid-like-sticker {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.25rem;
-		padding: 0.3rem 0.6rem;
-		border: none;
-		border-radius: 4px;
-		background: rgba(255, 240, 245, 0.95);
-		box-shadow: 0 1px 3px rgba(0,0,0,0.15);
-		color: #c53030;
-		font-family: 'Kalam', cursive;
-		font-size: 0.85rem;
-		font-weight: 700;
-		cursor: pointer;
-		transition: transform 0.2s ease, box-shadow 0.2s ease;
+	@keyframes polaroid-fade-in-up {
+		from {
+			opacity: 0;
+			transform: translateY(12px) scale(0.98) rotate(0deg);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0) scale(1) rotate(var(--polaroid-rotate, -1deg));
+		}
 	}
 
-	.polaroid-like-sticker:hover:not(:disabled) {
-		transform: scale(1.08);
-		box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-	}
-
-	.polaroid-like-sticker:disabled {
-		opacity: 0.9;
-		cursor: default;
-	}
-
-	.memory-like-icon {
-		font-size: 1rem;
-		line-height: 1;
-	}
-
-	.memory-like-count {
-		min-width: 1.25ch;
-	}
-
-	/* Fade-in when changing slides */
-	.polaroid-card.fade-in {
-		animation: slide-appear 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-	}
-
-	@keyframes slide-appear {
-		from { opacity: 0; transform: scale(0.96) rotate(0deg); }
-		to { opacity: 1; transform: scale(1) rotate(var(--polaroid-rotate, -1deg)); }
-	}
-
-	/* Nav: large circular buttons floating off the wall */
-	.slideshow-nav {
-		width: 56px;
-		height: 56px;
+	:global(.slideshow-nav) {
+		width: 72px;
+		height: 72px;
 		border-radius: 50%;
 		background: #fff;
-		border: 2px solid rgba(0,0,0,0.08);
-		box-shadow: 0 6px 20px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.06);
-		font-size: 2rem;
+		border: none;
+		box-shadow: 0 6px 20px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08);
+		font-size: 2.5rem;
 		line-height: 1;
 		color: var(--wave-deep);
 		cursor: pointer;
@@ -844,32 +745,30 @@ import Lighthouse from '../components/Lighthouse.astro';
 		padding: 0;
 	}
 
-	.slideshow-nav:hover:not(:disabled) {
+	:global(.slideshow-nav:hover:not(:disabled)) {
 		transform: scale(1.1);
 		background: var(--wave-deep);
 		color: #fff;
-		box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+		box-shadow: 0 8px 28px rgba(0,0,0,0.18);
 	}
 
-	.slideshow-nav:disabled {
+	:global(.slideshow-nav:disabled) {
 		opacity: 0.35;
 		cursor: not-allowed;
 	}
 
-	/* Pagination: handwritten note in corner of wall */
-	.slideshow-pagination {
+	:global(.slideshow-pagination) {
 		position: absolute;
 		bottom: 1rem;
 		right: 1.25rem;
 		font-family: 'Kalam', cursive;
-		font-size: 1rem;
+		font-size: 0.95rem;
 		font-weight: 600;
 		color: var(--color-sepia);
-		opacity: 0.85;
-		letter-spacing: 0.02em;
+		opacity: 0.9;
 	}
 
-	.slideshow-pagination .current {
+	:global(.slideshow-pagination .current) {
 		color: var(--wave-deep);
 	}
 
