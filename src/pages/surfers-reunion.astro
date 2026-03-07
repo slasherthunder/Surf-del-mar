@@ -68,11 +68,20 @@ import Lighthouse from '../components/Lighthouse.astro';
 			</article>
 
 			<h2 class="reunion-subhead reunion-memories-heading">SHARED MEMORIES</h2>
-			<div id="shared-memories-slideshow" class="shared-memories-slideshow" aria-live="polite">
+			<div id="shared-memories-container" class="shared-memories-container" aria-live="polite">
 				<p id="shared-memories-loading" class="shared-memories-msg">Loading…</p>
 			</div>
 		</div>
 	</section>
+
+	<!-- Lightbox for photo zoom -->
+	<div id="memory-lightbox" class="memory-lightbox" role="dialog" aria-modal="true" aria-label="View photo" hidden>
+		<div class="memory-lightbox-overlay" id="memory-lightbox-overlay"></div>
+		<div class="memory-lightbox-content">
+			<button type="button" class="memory-lightbox-close" id="memory-lightbox-close" aria-label="Close">×</button>
+			<img id="memory-lightbox-img" src="" alt="" class="memory-lightbox-img" />
+		</div>
+	</div>
 
 	<!-- Share memories modal -->
 	<div id="share-memories-modal" class="share-memories-modal" role="dialog" aria-labelledby="share-memories-title" aria-modal="true" hidden>
@@ -113,11 +122,18 @@ import Lighthouse from '../components/Lighthouse.astro';
 		const fileInput = document.getElementById('memory-photo') as HTMLInputElement;
 		const errorEl = document.getElementById('share-memories-error');
 		const successEl = document.getElementById('share-memories-success');
-		const slideshowEl = document.getElementById('shared-memories-slideshow');
+		const containerEl = document.getElementById('shared-memories-container');
 		const loadingEl = document.getElementById('shared-memories-loading');
+		const lightbox = document.getElementById('memory-lightbox');
+		const lightboxImg = document.getElementById('memory-lightbox-img') as HTMLImageElement;
+		const lightboxOverlay = document.getElementById('memory-lightbox-overlay');
+		const lightboxClose = document.getElementById('memory-lightbox-close');
 
 		let memoriesList: SharedMemory[] = [];
-		let currentSlideIndex = 0;
+
+		function randomRotation() {
+			return (Math.random() * 6 - 3).toFixed(2);
+		}
 
 		function openModal() {
 			if (modal) modal.hidden = false;
@@ -129,73 +145,84 @@ import Lighthouse from '../components/Lighthouse.astro';
 			if (modal) modal.hidden = true;
 		}
 
+		function openLightbox(src: string, alt: string) {
+			if (lightboxImg) { lightboxImg.src = src; lightboxImg.alt = alt; }
+			if (lightbox) lightbox.hidden = false;
+		}
+		function closeLightbox() {
+			if (lightbox) lightbox.hidden = true;
+		}
+
 		openBtn?.addEventListener('click', openModal);
 		overlay?.addEventListener('click', closeModal);
 		cancelBtn?.addEventListener('click', closeModal);
+		lightboxOverlay?.addEventListener('click', closeLightbox);
+		lightboxClose?.addEventListener('click', closeLightbox);
 
 		async function renderMemories() {
-			if (!slideshowEl) return;
+			if (!containerEl) return;
 			if (loadingEl) loadingEl.textContent = 'Loading…';
 			const result = await getSharedMemories();
 			if (loadingEl) loadingEl.remove();
 			if (!result.ok) {
-				slideshowEl.innerHTML = `<p class="shared-memories-msg shared-memories-error">Couldn't load memories. ${escapeHtml(result.error)} Check Netlify env vars (PUBLIC_FIREBASE_*) and that Firestore rules are deployed.</p>`;
+				containerEl.innerHTML = `<p class="shared-memories-msg shared-memories-error">Couldn't load memories. ${escapeHtml(result.error)} Check Netlify env vars (PUBLIC_FIREBASE_*) and that Firestore rules are deployed.</p>`;
 				return;
 			}
 			memoriesList = result.memories.filter((m) => m.imageUrl && m.imageUrl.startsWith('data:'));
 			if (memoriesList.length === 0) {
-				slideshowEl.innerHTML = '<p class="shared-memories-msg">No memories yet. Be the first to share! If you already submitted a photo, try sharing again—earlier submissions may not have been saved.</p>';
+				containerEl.innerHTML = '<p class="shared-memories-msg">No memories yet. Be the first to share! If you already submitted a photo, try sharing again—earlier submissions may not have been saved.</p>';
 				return;
 			}
-			currentSlideIndex = 0;
-			renderSlide();
-		}
-
-		function renderSlide() {
-			if (!slideshowEl || memoriesList.length === 0) return;
-			const m = memoriesList[currentSlideIndex];
-			const oneBased = currentSlideIndex + 1;
-			const total = memoriesList.length;
-			slideshowEl.innerHTML = `
-				<div class="slideshow-inner">
-					<button type="button" class="slideshow-prev" aria-label="Previous memory" ${total <= 1 ? 'disabled' : ''}>‹</button>
-					<article class="shared-memory-card slideshow-card">
-						<img src="${m.imageUrl}" alt="${m.caption || 'Shared memory'}" class="shared-memory-img" loading="lazy" />
-						<div class="shared-memory-meta">
-							<div class="shared-memory-caption">${m.caption ? escapeHtml(m.caption) : ''}</div>
-							${m.name ? `<div class="shared-memory-name">— ${escapeHtml(m.name)}</div>` : ''}
-							<button type="button" class="memory-like-btn" data-memory-id="${escapeHtml(m.id)}" aria-label="Like this memory">
+			const gridHtml = `
+				<div class="memories-grid memories-grid-corkboard">
+					${memoriesList.map((m) => {
+						const rot = randomRotation();
+						return `
+						<article class="polaroid-card" style="--polaroid-rotate: ${rot}deg">
+							<div class="polaroid-tape" aria-hidden="true"></div>
+							<button type="button" class="polaroid-like-sticker memory-like-btn" data-memory-id="${escapeHtml(m.id)}" aria-label="Like this memory">
 								<span class="memory-like-icon" aria-hidden="true">♥</span>
 								<span class="memory-like-count">${m.likes}</span>
 							</button>
-						</div>
-					</article>
-					<button type="button" class="slideshow-next" aria-label="Next memory" ${total <= 1 ? 'disabled' : ''}>›</button>
-				</div>
-				<div class="slideshow-footer">
-					<span class="slideshow-counter">${oneBased} / ${total}</span>
-					<div class="slideshow-dots">${memoriesList.map((_, i) => `<button type="button" class="slideshow-dot ${i === currentSlideIndex ? 'active' : ''}" aria-label="Go to memory ${i + 1}" data-index="${i}"></button>`).join('')}</div>
+							<button type="button" class="polaroid-img-wrap" data-lightbox-src="${escapeHtml(m.imageUrl)}" data-lightbox-alt="${escapeHtml(m.caption || 'Shared memory')}">
+								<img src="${m.imageUrl}" alt="${escapeHtml(m.caption || 'Shared memory')}" class="polaroid-img" loading="lazy" />
+							</button>
+							<div class="polaroid-caption">${m.caption ? escapeHtml(m.caption) : ''}</div>
+							${m.name ? `<div class="polaroid-name">— ${escapeHtml(m.name)}</div>` : ''}
+						</article>`;
+					}).join('')}
 				</div>
 			`;
-			slideshowEl.querySelector('.slideshow-prev')?.addEventListener('click', () => { currentSlideIndex = (currentSlideIndex - 1 + total) % total; renderSlide(); });
-			slideshowEl.querySelector('.slideshow-next')?.addEventListener('click', () => { currentSlideIndex = (currentSlideIndex + 1) % total; renderSlide(); });
-			slideshowEl.querySelectorAll('.slideshow-dot').forEach((el, i) => el.addEventListener('click', () => { currentSlideIndex = i; renderSlide(); }));
-			slideshowEl.querySelector('.memory-like-btn')?.addEventListener('click', async (e) => {
-				const btn = (e.currentTarget as HTMLElement);
-				const id = btn.getAttribute('data-memory-id');
-				if (!id) return;
-				btn.setAttribute('disabled', '');
-				try {
-					const res = await fetch(LIKE_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ memoryId: id }) });
-					const data = await res.json().catch(() => ({}));
-					if (res.ok && typeof data.likes === 'number') {
-						const mem = memoriesList.find((x) => x.id === id);
-						if (mem) mem.likes = data.likes;
-						btn.querySelector('.memory-like-count')!.textContent = String(data.likes);
+			containerEl.innerHTML = gridHtml;
+
+			containerEl.querySelectorAll('.polaroid-img-wrap').forEach((btn) => {
+				btn.addEventListener('click', () => {
+					const src = btn.getAttribute('data-lightbox-src');
+					const alt = btn.getAttribute('data-lightbox-alt') || '';
+					if (src) openLightbox(src, alt);
+				});
+			});
+
+			containerEl.querySelectorAll('.memory-like-btn').forEach((btn) => {
+				btn.addEventListener('click', async (e) => {
+					e.stopPropagation();
+					const el = e.currentTarget as HTMLElement;
+					const id = el.getAttribute('data-memory-id');
+					if (!id) return;
+					el.setAttribute('disabled', '');
+					try {
+						const res = await fetch(LIKE_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ memoryId: id }) });
+						const data = await res.json().catch(() => ({}));
+						if (res.ok && typeof data.likes === 'number') {
+							const mem = memoriesList.find((x) => x.id === id);
+							if (mem) mem.likes = data.likes;
+							const countEl = el.querySelector('.memory-like-count');
+							if (countEl) countEl.textContent = String(data.likes);
+						}
+					} finally {
+						el.removeAttribute('disabled');
 					}
-				} finally {
-					btn.removeAttribute('disabled');
-				}
+				});
 			});
 		}
 
@@ -567,11 +594,13 @@ import Lighthouse from '../components/Lighthouse.astro';
 		color: var(--color-cream);
 	}
 
+	@import url('https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&display=swap');
+
 	.reunion-memories-heading {
 		margin-top: 3rem;
 	}
 
-	.shared-memories-slideshow {
+	.shared-memories-container {
 		margin-top: 1rem;
 	}
 
@@ -588,151 +617,225 @@ import Lighthouse from '../components/Lighthouse.astro';
 		max-width: 48ch;
 	}
 
-	.slideshow-inner {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 0.75rem;
-		flex-wrap: wrap;
+	/* Corkboard masonry grid */
+	.memories-grid-corkboard {
+		background: linear-gradient(180deg, #8b6914 0%, #6b4a0a 100%);
+		background-image:
+			repeating-linear-gradient(
+				90deg,
+				transparent,
+				transparent 2px,
+				rgba(0,0,0,0.03) 2px,
+				rgba(0,0,0,0.03) 4px
+			),
+			linear-gradient(180deg, #9a7b2e 0%, #7a5a1a 100%);
+		padding: 2rem 1rem 3rem;
+		border-radius: 8px;
+		box-shadow: inset 0 2px 20px rgba(0,0,0,0.2), 0 4px 24px rgba(0,0,0,0.15);
 	}
 
-	.slideshow-prev,
-	.slideshow-next {
-		flex-shrink: 0;
-		width: 48px;
-		height: 48px;
-		border-radius: 50%;
-		border: 2px solid var(--wave-mid);
-		background: rgba(255, 255, 255, 0.6);
-		color: var(--wave-deep);
-		font-size: 1.5rem;
-		line-height: 1;
-		cursor: pointer;
-		transition: background 0.2s ease, transform 0.2s ease;
-	}
-	.slideshow-prev:hover:not(:disabled),
-	.slideshow-next:hover:not(:disabled) {
-		background: var(--wave-deep);
-		color: var(--color-cream);
-		transform: scale(1.05);
-	}
-	.slideshow-prev:disabled,
-	.slideshow-next:disabled {
-		opacity: 0.4;
-		cursor: not-allowed;
+	.memories-grid {
+		column-count: 1;
+		column-gap: 1.5rem;
+		margin: 0 auto;
+		max-width: 900px;
 	}
 
-	.slideshow-card {
-		flex: 1 1 280px;
-		max-width: 520px;
+	@media (min-width: 480px) {
+		.memories-grid {
+			column-count: 2;
+		}
 	}
 
-	.shared-memory-card {
-		background: rgba(255, 255, 255, 0.5);
-		border-radius: 12px;
-		overflow: hidden;
-		border: 1px solid rgba(255, 255, 255, 0.6);
-		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+	@media (min-width: 768px) {
+		.memories-grid {
+			column-count: 3;
+		}
 	}
 
-	.shared-memory-img {
+	/* Polaroid card */
+	.polaroid-card {
+		position: relative;
+		break-inside: avoid;
+		margin-bottom: 1.5rem;
+		transform: rotate(var(--polaroid-rotate, 0deg));
+		transition: transform 0.25s ease;
+	}
+
+	.polaroid-card:hover {
+		transform: rotate(var(--polaroid-rotate, 0deg)) scale(1.02);
+	}
+
+	.polaroid-card {
+		display: inline-block;
 		width: 100%;
-		aspect-ratio: 4 / 3;
-		object-fit: cover;
-		display: block;
+		background: #faf8f5;
+		padding: 0.6rem 0.6rem 1.25rem;
+		box-shadow:
+			0 4px 6px rgba(0,0,0,0.07),
+			0 10px 20px rgba(0,0,0,0.12);
+		border: 1px solid rgba(0,0,0,0.06);
 	}
 
-	.shared-memory-meta {
-		padding: 0.75rem 1rem 1rem;
+	/* Scotch tape at top */
+	.polaroid-tape::before {
+		content: '';
+		position: absolute;
+		top: -4px;
+		left: 50%;
+		transform: translateX(-50%) rotate(-3deg);
+		width: 60%;
+		height: 22px;
+		background: linear-gradient(180deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.35) 50%, rgba(255,255,255,0.2) 100%);
+		box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+		z-index: 1;
+		pointer-events: none;
 	}
 
-	.shared-memory-caption,
-	.shared-memory-name {
-		font-family: var(--font-body);
-		font-size: 0.9rem;
-		color: var(--color-ink);
-		line-height: 1.5;
-		margin: 0;
-	}
-
-	.shared-memory-name {
-		font-size: 0.8rem;
-		color: var(--color-sepia);
-		padding-top: 0.25rem;
-		margin-bottom: 0.5rem;
-	}
-
-	.memory-like-btn {
+	/* Like sticker in corner */
+	.polaroid-like-sticker {
+		position: absolute;
+		top: 0.5rem;
+		right: 0.5rem;
+		z-index: 2;
 		display: inline-flex;
 		align-items: center;
-		gap: 0.35rem;
-		padding: 0.35rem 0.75rem;
-		border: 1px solid var(--color-sand-dark);
-		border-radius: 50px;
-		background: rgba(255, 255, 255, 0.6);
-		color: var(--color-ink);
-		font-family: var(--font-body);
-		font-size: 0.9rem;
+		gap: 0.2rem;
+		padding: 0.25rem 0.5rem;
+		border: none;
+		border-radius: 4px;
+		background: rgba(255, 240, 245, 0.95);
+		box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+		color: #c53030;
+		font-family: 'Kalam', cursive;
+		font-size: 0.85rem;
+		font-weight: 700;
 		cursor: pointer;
-		transition: background 0.2s ease, color 0.2s ease;
+		transition: transform 0.2s ease, box-shadow 0.2s ease;
 	}
-	.memory-like-btn:hover:not(:disabled) {
-		background: var(--wave-mid);
-		color: var(--color-cream);
-		border-color: var(--wave-mid);
+
+	.polaroid-like-sticker:hover:not(:disabled) {
+		transform: scale(1.08);
+		box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 	}
-	.memory-like-btn:disabled {
-		opacity: 0.8;
+
+	.polaroid-like-sticker:disabled {
+		opacity: 0.9;
 		cursor: default;
 	}
 
 	.memory-like-icon {
-		color: #c53030;
 		font-size: 1rem;
+		line-height: 1;
 	}
 
 	.memory-like-count {
-		font-weight: 600;
-		min-width: 1.5ch;
+		min-width: 1.25ch;
 	}
 
-	.slideshow-footer {
+	/* Clickable image area – square Polaroid frame */
+	.polaroid-img-wrap {
+		display: block;
+		width: 100%;
+		padding: 0;
+		border: none;
+		background: transparent;
+		cursor: zoom-in;
+		position: relative;
+		overflow: hidden;
+		aspect-ratio: 1;
+		margin-bottom: 0.5rem;
+	}
+
+	.polaroid-img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+		transition: transform 0.3s ease;
+	}
+
+	.polaroid-img-wrap:hover .polaroid-img {
+		transform: scale(1.03);
+	}
+
+	/* Handwriting font for caption */
+	.polaroid-caption,
+	.polaroid-name {
+		font-family: 'Kalam', cursive;
+		font-size: 0.9rem;
+		color: var(--color-ink);
+		line-height: 1.4;
+		margin: 0;
+		padding: 0 0.25rem;
+	}
+
+	.polaroid-name {
+		font-size: 0.8rem;
+		color: var(--color-sepia);
+		margin-top: 0.2rem;
+	}
+
+	/* Lightbox */
+	.memory-lightbox {
+		position: fixed;
+		inset: 0;
+		z-index: 10000;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		gap: 1rem;
-		margin-top: 1rem;
-		flex-wrap: wrap;
+		padding: 2rem;
+		background: rgba(0, 0, 0, 0.85);
 	}
 
-	.slideshow-counter {
-		font-family: var(--font-body);
-		font-size: 0.85rem;
-		color: var(--color-sepia);
-		font-weight: 600;
+	.memory-lightbox[hidden] {
+		display: none;
 	}
 
-	.slideshow-dots {
-		display: flex;
-		gap: 0.5rem;
-	}
-
-	.slideshow-dot {
-		width: 10px;
-		height: 10px;
-		border-radius: 50%;
-		border: 1px solid var(--color-sand-dark);
-		background: rgba(255, 255, 255, 0.5);
+	.memory-lightbox-overlay {
+		position: absolute;
+		inset: 0;
 		cursor: pointer;
-		transition: background 0.2s ease, transform 0.2s ease;
 	}
-	.slideshow-dot:hover {
-		background: var(--wave-light);
-		transform: scale(1.15);
+
+	.memory-lightbox-content {
+		position: relative;
+		max-width: 90vw;
+		max-height: 90vh;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 	}
-	.slideshow-dot.active {
+
+	.memory-lightbox-img {
+		max-width: 100%;
+		max-height: 85vh;
+		width: auto;
+		height: auto;
+		object-fit: contain;
+		box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+		border-radius: 4px;
+	}
+
+	.memory-lightbox-close {
+		position: absolute;
+		top: -2.5rem;
+		right: 0;
+		width: 2.5rem;
+		height: 2.5rem;
+		border: none;
+		border-radius: 50%;
+		background: var(--color-cream);
+		color: var(--color-ink);
+		font-size: 1.5rem;
+		line-height: 1;
+		cursor: pointer;
+		transition: background 0.2s ease, color 0.2s ease;
+	}
+
+	.memory-lightbox-close:hover {
 		background: var(--wave-deep);
-		border-color: var(--wave-deep);
+		color: var(--color-cream);
 	}
 
 	/* Share memories modal */
