@@ -190,8 +190,11 @@ import Lighthouse from '../components/Lighthouse.astro';
 								<img src="${m.imageUrl}" alt="Memory" class="polaroid-img" />
 							</button>
 							<div class="polaroid-caption-well">
-								<p class="polaroid-caption">${m.caption ? escapeHtml(m.caption) : 'Del Mar Waves.'}</p>
+								${m.caption ? `<p class="polaroid-caption">${escapeHtml(m.caption)}</p>` : ''}
 								${m.name ? `<p class="polaroid-name">— ${escapeHtml(m.name)}</p>` : ''}
+							</div>
+							<div class="polaroid-actions">
+								<a href="${m.imageUrl}" download="surf-del-mar-memory.jpg" class="polaroid-download-btn" id="download-memory-btn">Download memory</a>
 							</div>
 						</article>
 
@@ -212,6 +215,13 @@ import Lighthouse from '../components/Lighthouse.astro';
 			containerEl.querySelector('#zoom-trigger')?.addEventListener('click', () => {
 				openLightbox(m.imageUrl, m.caption || 'Shared memory');
 			});
+
+			const downloadBtn = containerEl.querySelector('#download-memory-btn');
+			if (downloadBtn && downloadBtn instanceof HTMLAnchorElement) {
+				downloadBtn.addEventListener('click', (e) => {
+					downloadBtn.setAttribute('download', `surf-del-mar-memory-${m.id || Date.now()}.jpg`);
+				});
+			}
 		}
 
 		function escapeHtml(s: string) {
@@ -708,6 +718,32 @@ import Lighthouse from '../components/Lighthouse.astro';
 		margin-top: 0.5rem;
 		margin-bottom: 0;
 		text-align: center;
+	}
+
+	:global(.polaroid-actions) {
+		display: flex;
+		justify-content: center;
+		margin-top: 1rem;
+	}
+
+	:global(.polaroid-download-btn) {
+		display: inline-block;
+		font-family: var(--font-body);
+		font-size: 0.85rem;
+		font-weight: 600;
+		color: var(--wave-deep);
+		background: transparent;
+		border: 2px solid var(--wave-mid);
+		border-radius: 50px;
+		padding: 0.4rem 1rem;
+		text-decoration: none;
+		transition: background 0.2s ease, color 0.2s ease;
+	}
+
+	:global(.polaroid-download-btn:hover) {
+		background: var(--wave-deep);
+		color: var(--color-cream);
+		border-color: var(--wave-deep);
 	}
 
 	:global(.polaroid-card.fade-in-up) {
