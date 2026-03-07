@@ -22,25 +22,49 @@ import Lighthouse from '../components/Lighthouse.astro';
 
 	<section class="festival-content">
 		<div class="container">
-			<p class="festival-intro">
-				SURF DEL MAR is presented by the Del Mar Historical Society as part of its ongoing mission to preserve and celebrate the history and culture of our unique seaside community, and especially to honor the many people who have helped shape the culture and spirit of surfing over the years. At the heart of the festival is a multi-generational Surfers Reunion, bringing together people who rode Del Mar's waves in the 1950s and 60s—and even earlier— alongside today's surfers and the next generations to follow.
-			</p>
+			<article class="event-card event-card-intro">
+				<p class="festival-intro">
+					SURF DEL MAR is presented by the Del Mar Historical Society as part of its ongoing mission to preserve and celebrate the history and culture of our unique seaside community, and especially to honor the many people who have helped shape the culture and spirit of surfing over the years. At the heart of the festival is a multi-generational Surfers Reunion, bringing together people who rode Del Mar's waves in the 1950s and 60s—and even earlier— alongside today's surfers and the next generations to follow.
+				</p>
+			</article>
 			<h2 class="festival-subhead">SURF DEL MAR brings together many aspects of surf culture in one vibrant, festive event:</h2>
-			<ul class="festival-list">
-				<li>Surfers Reunion celebrating decades of Del Mar surf history</li>
-				<li>Concerts with the MarDels and Peter Sprague</li>
-				<li>Film Festival showcasing the classic Endless Summer and the debut of a Jim Lischer film on Del Mar surfers over the years</li>
-				<li>Surfwriter's Book Fair featuring authors and publications dedicated to surfing</li>
-				<li>Art Walk highlighting local artists and student artwork from Del Mar schools</li>
-				<li>Surfing and Sustainability Climate Change Symposium exploring how surfers and coastal communities like Del Mar are responding to changing oceans and shorelines</li>
-			</ul>
-			<p class="festival-free">
-				ALL EVENTS WILL BE FREE AND OPEN TO THE PUBLIC, WELCOMING RESIDENTS, VISITORS, SURFERS, FAMILIES AND ANYONE WHO SHARES A LOVE OF THE OCEAN
-			</p>
+			<div class="event-cards">
+				<article class="event-card">
+					<h3>Surfers Reunion</h3>
+					<p>Celebrating decades of Del Mar surf history</p>
+				</article>
+				<article class="event-card">
+					<h3>Concerts</h3>
+					<p>With the MarDels and Peter Sprague</p>
+				</article>
+				<article class="event-card">
+					<h3>Film Festival</h3>
+					<p>Showcasing the classic Endless Summer and the debut of a Jim Lischer film on Del Mar surfers over the years</p>
+				</article>
+				<article class="event-card">
+					<h3>Surfwriter's Book Fair</h3>
+					<p>Featuring authors and publications dedicated to surfing</p>
+				</article>
+				<article class="event-card">
+					<h3>Art Walk</h3>
+					<p>Highlighting local artists and student artwork from Del Mar schools</p>
+				</article>
+				<article class="event-card event-card-advocacy">
+					<h3>Surfing and Sustainability</h3>
+					<p>Climate Change Symposium exploring how surfers and coastal communities like Del Mar are responding to changing oceans and shorelines</p>
+				</article>
+			</div>
+			<article class="event-card event-card-free">
+				<p class="festival-free">
+					ALL EVENTS WILL BE FREE AND OPEN TO THE PUBLIC, WELCOMING RESIDENTS, VISITORS, SURFERS, FAMILIES AND ANYONE WHO SHARES A LOVE OF THE OCEAN
+				</p>
+			</article>
 			<h2 class="festival-tagline-heading">HONORING THE PAST—INSPIRING THE FUTURE</h2>
-			<p class="festival-outro">
-				By bringing together stories, art, film science and shared memories, SURF DEL MAR honors the pioneers who helped shape surf culture while inspiring future generations to care for the coast, the ocean, and the traditions that grew from them.
-			</p>
+			<article class="event-card">
+				<p class="festival-outro">
+					By bringing together stories, art, film science and shared memories, SURF DEL MAR honors the pioneers who helped shape surf culture while inspiring future generations to care for the coast, the ocean, and the traditions that grew from them.
+				</p>
+			</article>
 		</div>
 	</section>
 </BaseLayout>
@@ -123,7 +147,7 @@ import Lighthouse from '../components/Lighthouse.astro';
 		font-size: 1.0625rem;
 		color: var(--color-ink);
 		line-height: 1.75;
-		margin: 0 0 1.75rem 0;
+		margin: 0;
 	}
 
 	.festival-subhead {
@@ -135,18 +159,75 @@ import Lighthouse from '../components/Lighthouse.astro';
 		line-height: 1.4;
 	}
 
-	.festival-list {
+	.event-cards {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 1.25rem;
+		margin-bottom: 1.5rem;
+	}
+
+	@media (min-width: 640px) {
+		.event-cards {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+
+	@media (min-width: 900px) {
+		.event-cards {
+			gap: 1.5rem;
+		}
+	}
+
+	.event-card {
+		background: rgba(255, 255, 255, 0.4);
+		backdrop-filter: blur(10px);
+		-webkit-backdrop-filter: blur(10px);
+		padding: 1.5rem 1.5rem 1.5rem 1.25rem;
+		border-radius: 12px;
+		border: 1px solid rgba(255, 255, 255, 0.5);
+		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+		border-left: 6px solid #8b7355;
+		transition: transform 0.3s ease, box-shadow 0.3s ease;
+	}
+
+	.event-card:hover {
+		transform: translateX(10px);
+		box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
+	}
+
+	.event-card-intro {
+		margin-bottom: 1.5rem;
+	}
+
+	.event-card h3 {
+		font-family: var(--font-display);
+		font-size: 1.2rem;
+		font-weight: 600;
+		color: var(--color-ink);
+		margin: 0 0 0.6rem 0;
+		line-height: 1.3;
+	}
+
+	.event-card p {
 		font-family: var(--font-body);
 		font-size: 1rem;
 		color: var(--color-ink);
-		line-height: 1.75;
-		margin: 0 0 2rem 0;
-		padding-left: 1.5rem;
-		list-style: disc;
+		line-height: 1.7;
+		margin: 0;
 	}
 
-	.festival-list li {
-		margin-bottom: 0.5rem;
+	.event-card-advocacy {
+		border-left-color: #e6b800;
+		background: rgba(255, 248, 220, 0.35);
+		box-shadow: 0 4px 20px rgba(230, 184, 0, 0.08);
+	}
+
+	.event-card-advocacy:hover {
+		box-shadow: 0 8px 28px rgba(230, 184, 0, 0.12);
+	}
+
+	.event-card-free {
+		margin-bottom: 1.5rem;
 	}
 
 	.festival-free {
@@ -157,11 +238,7 @@ import Lighthouse from '../components/Lighthouse.astro';
 		text-transform: uppercase;
 		color: var(--color-ink);
 		line-height: 1.5;
-		margin: 0 0 2rem 0;
-		padding: 1.25rem 1.5rem;
-		background: rgba(255, 255, 255, 0.5);
-		border-left: 4px solid #8b7355;
-		border-radius: 0 10px 10px 0;
+		margin: 0;
 	}
 
 	.festival-tagline-heading {
