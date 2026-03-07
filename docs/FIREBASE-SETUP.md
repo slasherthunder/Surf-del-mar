@@ -116,3 +116,12 @@ Image overrides are stored as data URLs inside Firestore (no Storage). Each docu
 - [ ] Service account key generated and pasted into Netlify as `FIREBASE_SERVICE_ACCOUNT`  
 - [ ] All env vars set in Netlify and site redeployed  
 - [ ] Log in as admin once and click **Save changes** on the schedule to seed Firestore  
+
+---
+
+## "Missing FIREBASE_SERVICE_ACCOUNT" troubleshooting
+
+- **Where are you seeing the error?**
+  - **On the live Netlify site (e.g. when submitting a memory):** The function runs on Netlify. Go to Netlify Dashboard → your site → **Site configuration** → **Environment variables**. Confirm `FIREBASE_SERVICE_ACCOUNT` exists with **no typo**, value = entire service account JSON. Set **Scopes** to **All** (or at least include runtime/functions). Then **Trigger deploy** (Deploys → Trigger deploy) so the new variable is picked up.
+  - **Running locally (`netlify dev` or similar):** The function runs on your machine. Create a `.env` file in the project root (same folder as `package.json`) and add one line: `FIREBASE_SERVICE_ACCOUNT={"type":"service_account",...}` (paste the full JSON from your Firebase service account key file, all on one line). Restart `netlify dev`. Do not commit `.env` (it is gitignored).
+- **Value format:** The value must be the **raw JSON** (starts with `{"type":"service_account",...}`). Not a file path, not wrapped in extra quotes.

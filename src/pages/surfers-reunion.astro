@@ -101,6 +101,7 @@ import Lighthouse from '../components/Lighthouse.astro';
 
 		const SUBMIT_URL = '/.netlify/functions/submit-memory';
 		const MAX_IMAGE_SIZE = 800 * 1024; // 800KB to stay under Firestore doc limits
+		const MAX_DIMENSION = 1200; // max width or height before upload
 
 		const openBtn = document.getElementById('reunion-share-memories-btn');
 		const modal = document.getElementById('share-memories-modal');
@@ -162,23 +163,23 @@ import Lighthouse from '../components/Lighthouse.astro';
 				errorEl.hidden = false;
 				return;
 			}
-			if (file.size > MAX_IMAGE_SIZE) {
-				errorEl.textContent = 'Photo is too large. Please use an image under 800 KB.';
-				errorEl.hidden = false;
-				return;
-			}
 			const caption = (document.getElementById('memory-caption') as HTMLTextAreaElement)?.value?.trim() || '';
 			const name = (document.getElementById('memory-name') as HTMLInputElement)?.value?.trim() || '';
 			const submitBtn = document.getElementById('share-memories-submit') as HTMLButtonElement;
 			submitBtn.disabled = true;
 			try {
-				const base64 = await fileToBase64(file);
+				const { base64, contentType } = await compressImageForUpload(file, MAX_IMAGE_SIZE, MAX_DIMENSION);
+				if (!base64) {
+					errorEl.textContent = 'Photo is too large. We couldn\'t shrink it enough—try a smaller image.';
+					errorEl.hidden = false;
+					return;
+				}
 				const res = await fetch(SUBMIT_URL, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({
 						imageBase64: base64,
-						contentType: file.type || 'image/jpeg',
+						contentType,
 						caption,
 						name,
 					}),
@@ -200,7 +201,46 @@ import Lighthouse from '../components/Lighthouse.astro';
 			}
 		});
 
-		function fileToBase64(file: File): Promise<string> {
+		/** Resize/compress image to stay under maxSizeBytes; returns base64 + contentType or null if still too big. */
+		async function compressImageForUpload(file: File, maxSizeBytes: number, maxDim: number): Promise<{ base64: string; contentType: string } | { base64: null; contentType: string }> {
+			const contentType = 'image/jpeg';
+			if (!file.type.startsWith('image/')) return { base64: null, contentType };
+
+			const img = await loadImage(file);
+			const { width, height } = img;
+			const scale = Math.min(1, maxDim / Math.max(width, height));
+			const w = Math.round(width * scale);
+			const h = Math.round(height * scale);
+
+			const canvas = document.createElement('canvas');
+			canvas.width = w;
+			canvas.height = h;
+			const ctx = canvas.getContext('2d');
+			if (!ctx) return { base64: null, contentType };
+			ctx.drawImage(img, 0, 0, w, h);
+
+			for (const q of [0.85, 0.7, 0.55, 0.4, 0.25]) {
+				const blob = await new Promise<Blob | null>((res) => canvas.toBlob(res, 'image/jpeg', q));
+				if (!blob) continue;
+				if (blob.size <= maxSizeBytes) {
+					const base64 = await blobToBase64(blob);
+					return { base64, contentType };
+				}
+			}
+			return { base64: null, contentType };
+		}
+
+		function loadImage(file: File): Promise<HTMLImageElement> {
+			return new Promise((resolve, reject) => {
+				const url = URL.createObjectURL(file);
+				const img = new Image();
+				img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
+				img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Image load failed')); };
+				img.src = url;
+			});
+		}
+
+		function blobToBase64(blob: Blob): Promise<string> {
 			return new Promise((resolve, reject) => {
 				const reader = new FileReader();
 				reader.onload = () => {
@@ -209,7 +249,7 @@ import Lighthouse from '../components/Lighthouse.astro';
 					resolve(base64 || '');
 				};
 				reader.onerror = reject;
-				reader.readAsDataURL(file);
+				reader.readAsDataURL(blob);
 			});
 		}
 
