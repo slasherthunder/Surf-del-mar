@@ -62,12 +62,159 @@ import Lighthouse from '../components/Lighthouse.astro';
 			<article class="event-card event-card-cta">
 				<h2 class="reunion-cta-heading">DO YOU HAVE A DEL MAR SURF STORY? SHARE IT WITH EVERYONE!</h2>
 				<p class="reunion-cta-body">
-					Send us your photos, your memories and names of people we should invite. We'll include them in the <strong>SHARED MEMORIES</strong> section of the website.
+					Send us your photos, your memories and names of people we should invite. We'll include them in the <strong>SHARED MEMORIES</strong> section below.
 				</p>
-				<a href="/schedule/" class="reunion-schedule-link">View full schedule</a>
+				<button type="button" class="reunion-share-btn" id="reunion-share-memories-btn">Share your memories</button>
 			</article>
+
+			<h2 class="reunion-subhead reunion-memories-heading">SHARED MEMORIES</h2>
+			<div id="shared-memories-grid" class="shared-memories-grid" aria-live="polite">
+				<p id="shared-memories-loading" class="shared-memories-msg">Loading…</p>
+			</div>
 		</div>
 	</section>
+
+	<!-- Share memories modal -->
+	<div id="share-memories-modal" class="share-memories-modal" role="dialog" aria-labelledby="share-memories-title" aria-modal="true" hidden>
+		<div class="share-memories-overlay" id="share-memories-overlay"></div>
+		<div class="share-memories-box">
+			<h2 id="share-memories-title" class="share-memories-title">Share your memories</h2>
+			<form id="share-memories-form" class="share-memories-form">
+				<label for="memory-photo" class="share-memories-label">Photo</label>
+				<input type="file" id="memory-photo" name="photo" accept="image/*" required class="share-memories-file" />
+				<label for="memory-caption" class="share-memories-label">Your memory (optional)</label>
+				<textarea id="memory-caption" name="caption" class="share-memories-textarea" rows="3" placeholder="Tell us about this photo…" maxlength="1000"></textarea>
+				<label for="memory-name" class="share-memories-label">Your name (optional)</label>
+				<input type="text" id="memory-name" name="name" class="share-memories-input" placeholder="Name" maxlength="200" />
+				<p id="share-memories-error" class="share-memories-error" aria-live="polite" hidden></p>
+				<p id="share-memories-success" class="share-memories-success" aria-live="polite" hidden>Thank you! Your memory has been added.</p>
+				<div class="share-memories-actions">
+					<button type="button" class="share-memories-btn share-memories-cancel" id="share-memories-cancel">Cancel</button>
+					<button type="submit" class="share-memories-btn share-memories-submit" id="share-memories-submit">Submit</button>
+				</div>
+			</form>
+		</div>
+	</div>
+
+	<script>
+		import { getSharedMemories } from '../lib/firebase';
+
+		const SUBMIT_URL = '/.netlify/functions/submit-memory';
+		const MAX_IMAGE_SIZE = 800 * 1024; // 800KB to stay under Firestore doc limits
+
+		const openBtn = document.getElementById('reunion-share-memories-btn');
+		const modal = document.getElementById('share-memories-modal');
+		const overlay = document.getElementById('share-memories-overlay');
+		const form = document.getElementById('share-memories-form');
+		const cancelBtn = document.getElementById('share-memories-cancel');
+		const fileInput = document.getElementById('memory-photo') as HTMLInputElement;
+		const errorEl = document.getElementById('share-memories-error');
+		const successEl = document.getElementById('share-memories-success');
+		const grid = document.getElementById('shared-memories-grid');
+		const loadingEl = document.getElementById('shared-memories-loading');
+
+		function openModal() {
+			if (modal) modal.hidden = false;
+			if (errorEl) { errorEl.hidden = true; errorEl.textContent = ''; }
+			if (successEl) successEl.hidden = true;
+			if (form) form.reset();
+		}
+		function closeModal() {
+			if (modal) modal.hidden = true;
+		}
+
+		openBtn?.addEventListener('click', openModal);
+		overlay?.addEventListener('click', closeModal);
+		cancelBtn?.addEventListener('click', closeModal);
+
+		async function renderMemories() {
+			if (!grid) return;
+			if (loadingEl) loadingEl.textContent = 'Loading…';
+			const memories = await getSharedMemories();
+			if (loadingEl) loadingEl.remove();
+			if (memories.length === 0) {
+				grid.innerHTML = '<p class="shared-memories-msg">No memories yet. Be the first to share!</p>';
+				return;
+			}
+			grid.innerHTML = memories.map((m) => `
+				<article class="shared-memory-card">
+					<img src="${m.imageUrl}" alt="${m.caption || 'Shared memory'}" class="shared-memory-img" loading="lazy" />
+					<div class="shared-memory-caption">${m.caption ? escapeHtml(m.caption) : ''}</div>
+					${m.name ? `<div class="shared-memory-name">— ${escapeHtml(m.name)}</div>` : ''}
+				</article>
+			`).join('');
+		}
+
+		function escapeHtml(s: string) {
+			const div = document.createElement('div');
+			div.textContent = s;
+			return div.innerHTML;
+		}
+
+		form?.addEventListener('submit', async (e) => {
+			e.preventDefault();
+			if (!errorEl || !successEl || !fileInput) return;
+			errorEl.hidden = true;
+			successEl.hidden = true;
+			const file = fileInput.files?.[0];
+			if (!file) {
+				errorEl.textContent = 'Please choose a photo.';
+				errorEl.hidden = false;
+				return;
+			}
+			if (file.size > MAX_IMAGE_SIZE) {
+				errorEl.textContent = 'Photo is too large. Please use an image under 800 KB.';
+				errorEl.hidden = false;
+				return;
+			}
+			const caption = (document.getElementById('memory-caption') as HTMLTextAreaElement)?.value?.trim() || '';
+			const name = (document.getElementById('memory-name') as HTMLInputElement)?.value?.trim() || '';
+			const submitBtn = document.getElementById('share-memories-submit') as HTMLButtonElement;
+			submitBtn.disabled = true;
+			try {
+				const base64 = await fileToBase64(file);
+				const res = await fetch(SUBMIT_URL, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						imageBase64: base64,
+						contentType: file.type || 'image/jpeg',
+						caption,
+						name,
+					}),
+				});
+				const data = await res.json().catch(() => ({}));
+				if (!res.ok) {
+					errorEl.textContent = data.error || 'Something went wrong. Please try again.';
+					errorEl.hidden = false;
+					return;
+				}
+				successEl.hidden = false;
+				await renderMemories();
+				setTimeout(closeModal, 1500);
+			} catch (err) {
+				errorEl.textContent = 'Something went wrong. Please try again.';
+				errorEl.hidden = false;
+			} finally {
+				submitBtn.disabled = false;
+			}
+		});
+
+		function fileToBase64(file: File): Promise<string> {
+			return new Promise((resolve, reject) => {
+				const reader = new FileReader();
+				reader.onload = () => {
+					const result = reader.result as string;
+					const base64 = result.split(',')[1];
+					resolve(base64 || '');
+				};
+				reader.onerror = reject;
+				reader.readAsDataURL(file);
+			});
+		}
+
+		renderMemories();
+	</script>
 </BaseLayout>
 
 <style>
@@ -307,21 +454,193 @@ import Lighthouse from '../components/Lighthouse.astro';
 		margin: 0 0 1.25rem 0;
 	}
 
-	.reunion-schedule-link {
+	.reunion-share-btn {
 		display: inline-block;
 		font-family: var(--font-body);
 		font-size: 0.9rem;
 		font-weight: 600;
 		color: var(--wave-deep);
+		background: transparent;
 		text-decoration: none;
 		padding: 0.5rem 1.25rem;
 		border: 2px solid var(--wave-mid);
 		border-radius: 50px;
+		cursor: pointer;
 		transition: background 0.25s ease, color 0.25s ease;
 	}
 
-	.reunion-schedule-link:hover {
+	.reunion-share-btn:hover {
 		background: var(--wave-deep);
 		color: var(--color-cream);
+	}
+
+	.reunion-memories-heading {
+		margin-top: 3rem;
+	}
+
+	.shared-memories-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+		gap: 1.5rem;
+		margin-top: 1rem;
+	}
+
+	.shared-memories-msg {
+		font-family: var(--font-body);
+		color: var(--color-sepia);
+		font-style: italic;
+		grid-column: 1 / -1;
+		margin: 0;
+	}
+
+	.shared-memory-card {
+		background: rgba(255, 255, 255, 0.5);
+		border-radius: 12px;
+		overflow: hidden;
+		border: 1px solid rgba(255, 255, 255, 0.6);
+		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+	}
+
+	.shared-memory-img {
+		width: 100%;
+		aspect-ratio: 4 / 3;
+		object-fit: cover;
+		display: block;
+	}
+
+	.shared-memory-caption,
+	.shared-memory-name {
+		font-family: var(--font-body);
+		font-size: 0.9rem;
+		color: var(--color-ink);
+		padding: 0.75rem 1rem 0 1rem;
+		line-height: 1.5;
+		margin: 0;
+	}
+
+	.shared-memory-name {
+		font-size: 0.8rem;
+		color: var(--color-sepia);
+		padding-top: 0.25rem;
+		padding-bottom: 1rem;
+	}
+
+	/* Share memories modal */
+	.share-memories-modal {
+		position: fixed;
+		inset: 0;
+		z-index: 9999;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 1rem;
+	}
+
+	.share-memories-modal[hidden] {
+		display: none;
+	}
+
+	.share-memories-overlay {
+		position: absolute;
+		inset: 0;
+		background: rgba(0, 0, 0, 0.5);
+	}
+
+	.share-memories-box {
+		position: relative;
+		background: var(--color-cream);
+		border-radius: 12px;
+		padding: 1.5rem 1.75rem;
+		box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+		min-width: 280px;
+		max-width: 420px;
+		width: 100%;
+	}
+
+	.share-memories-title {
+		font-family: var(--font-display);
+		font-size: 1.35rem;
+		font-weight: 600;
+		color: var(--color-ink);
+		margin: 0 0 1.25rem 0;
+	}
+
+	.share-memories-form {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+
+	.share-memories-label {
+		font-family: var(--font-body);
+		font-size: 0.9rem;
+		font-weight: 600;
+		color: var(--color-ink);
+	}
+
+	.share-memories-file,
+	.share-memories-input,
+	.share-memories-textarea {
+		font-family: var(--font-body);
+		font-size: 1rem;
+		padding: 0.5rem 0.75rem;
+		border: 1px solid var(--color-sand-dark);
+		border-radius: 6px;
+		background: #fff;
+	}
+
+	.share-memories-textarea {
+		resize: vertical;
+		min-height: 4rem;
+	}
+
+	.share-memories-error {
+		font-size: 0.9rem;
+		color: #b91c1c;
+		margin: 0;
+	}
+
+	.share-memories-success {
+		font-size: 0.9rem;
+		color: #15803d;
+		margin: 0;
+	}
+
+	.share-memories-actions {
+		display: flex;
+		gap: 0.75rem;
+		justify-content: flex-end;
+		margin-top: 0.5rem;
+	}
+
+	.share-memories-btn {
+		font-family: var(--font-body);
+		font-size: 0.9rem;
+		font-weight: 600;
+		padding: 0.5rem 1.25rem;
+		border-radius: 6px;
+		cursor: pointer;
+		border: 1px solid transparent;
+		transition: background 0.2s ease;
+	}
+
+	.share-memories-cancel {
+		background: transparent;
+		color: var(--color-ink);
+		border-color: var(--color-sand-dark);
+	}
+
+	.share-memories-submit {
+		background: var(--wave-deep);
+		color: var(--color-cream);
+	}
+
+	.share-memories-submit:hover:not(:disabled) {
+		background: var(--wave-mid);
+	}
+
+	.share-memories-submit:disabled {
+		opacity: 0.7;
+		cursor: not-allowed;
 	}
 </style>
