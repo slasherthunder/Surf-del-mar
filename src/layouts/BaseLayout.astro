@@ -1,4 +1,7 @@
 ---
+import AdminLoginButton from '../components/AdminLoginButton.astro';
+import AdminBar from '../components/AdminBar.astro';
+
 interface Props {
 	title: string;
 	description?: string;
@@ -19,8 +22,10 @@ const { title, description = "Preserving and celebrating the history of Del Mar,
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet" />
+		<script src="https://identity.netlify.com/v1/netlify-identity-widget.js" defer></script>
 	</head>
 	<body>
+		<AdminBar />
 		<div class="texture-overlay" aria-hidden="true"></div>
 		<div class="credits-bar" role="contentinfo">
 			We are deeply indebted to the creators of this website: Torrey Pines students Aaron Nayki, Jervis Fernandes, Keshav Bhaskar and Cole Chapman.
@@ -33,41 +38,44 @@ const { title, description = "Preserving and celebrating the history of Del Mar,
 						<span class="logo-text">Del Mar Historical Society</span>
 					</a>
 				</div>
-				<ul>
-					<li>
-						<div class="tower-container">
-							<a href="/" class="nav-tower"><span class="nav-tower-text">Home</span></a>
-						</div>
-					</li>
-					<li>
-						<div class="surf-container">
-							<a href="/surfing-festival/" class="nav-surfboard"><span class="nav-surfboard-text">Surfing Festival</span></a>
-						</div>
-					</li>
-					<li>
-						<div class="schedule-container">
-							<a href="/schedule/" class="nav-schedule">
-								<span class="nav-schedule-paper">
-									<span class="nav-schedule-icon" aria-hidden="true">
-										<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" focusable="false">
-											<path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/>
-											<path d="m9 16 2 2 4-4"/>
-										</svg>
+				<div class="nav-right">
+					<ul>
+						<li>
+							<div class="tower-container">
+								<a href="/" class="nav-tower"><span class="nav-tower-text">Home</span></a>
+							</div>
+						</li>
+						<li>
+							<div class="surf-container">
+								<a href="/surfing-festival/" class="nav-surfboard"><span class="nav-surfboard-text">Surfing Festival</span></a>
+							</div>
+						</li>
+						<li>
+							<div class="schedule-container">
+								<a href="/schedule/" class="nav-schedule">
+									<span class="nav-schedule-paper">
+										<span class="nav-schedule-icon" aria-hidden="true">
+											<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" focusable="false">
+												<path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/>
+												<path d="m9 16 2 2 4-4"/>
+											</svg>
+										</span>
+										<span class="nav-schedule-text">Schedule</span>
 									</span>
-									<span class="nav-schedule-text">Schedule</span>
-								</span>
-							</a>
-						</div>
-					</li>
-					<li>
-						<div class="sponsors-container">
-							<a href="/sponsors/" class="nav-sponsors">
-								<span class="nav-sponsors-star" aria-hidden="true">★</span>
-								<span class="nav-sponsors-text">Sponsors</span>
-							</a>
-						</div>
-					</li>
-				</ul>
+								</a>
+							</div>
+						</li>
+						<li>
+							<div class="sponsors-container">
+								<a href="/sponsors/" class="nav-sponsors">
+									<span class="nav-sponsors-star" aria-hidden="true">★</span>
+									<span class="nav-sponsors-text">Sponsors</span>
+								</a>
+							</div>
+						</li>
+					</ul>
+					<AdminLoginButton />
+				</div>
 			</nav>
 		</header>
 		<main>
@@ -76,6 +84,25 @@ const { title, description = "Preserving and celebrating the history of Del Mar,
 		<footer>
 			<p>© {new Date().getFullYear()} Surf Del Mar. Preserving our coastal heritage.</p>
 		</footer>
+
+		<div id="image-change-modal" class="image-change-modal" role="dialog" aria-labelledby="image-change-title" aria-modal="true" hidden>
+			<div class="image-change-overlay"></div>
+			<div class="image-change-box">
+				<h2 id="image-change-title" class="image-change-title">Change this image?</h2>
+				<div class="image-change-actions">
+					<button type="button" class="image-change-btn image-change-no" id="image-change-no">No</button>
+					<label class="image-change-btn image-change-yes">
+						Yes, choose file
+						<input type="file" id="image-change-input" accept="image/*" class="image-change-input-hidden" />
+					</label>
+				</div>
+			</div>
+		</div>
+
+		<script>
+			import { initAdminImages } from '../lib/admin-images';
+			initAdminImages();
+		</script>
 	</body>
 </html>
 
@@ -190,6 +217,20 @@ const { title, description = "Preserving and celebrating the history of Del Mar,
 	.logo-text {
 		font-family: var(--font-display);
 		font-weight: 700;
+	}
+
+	.nav-right {
+		display: flex;
+		align-items: center;
+		gap: 1.5rem;
+	}
+
+	/* Ensure Admin Login button is always visible (layout owns critical styles so it shows even if component CSS loads late) */
+	.nav-right :global(.admin-login-btn) {
+		margin-top: 0;
+		display: inline-block;
+		min-height: 2.25rem;
+		flex-shrink: 0;
 	}
 
 	nav ul {
@@ -559,5 +600,69 @@ const { title, description = "Preserving and celebrating the history of Del Mar,
 		mask-image: linear-gradient(to bottom, black 0%, black 65%, transparent 100%);
 		-webkit-mask-size: 100% 100%;
 		mask-size: 100% 100%;
+	}
+
+	/* Image change modal (admin) */
+	.image-change-modal {
+		position: fixed;
+		inset: 0;
+		z-index: 9999;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 1rem;
+	}
+	.image-change-modal[hidden] {
+		display: none !important;
+	}
+	.image-change-overlay {
+		position: absolute;
+		inset: 0;
+		background: rgba(0, 0, 0, 0.5);
+	}
+	.image-change-box {
+		position: relative;
+		background: var(--color-cream);
+		border-radius: 12px;
+		padding: 1.5rem 1.75rem;
+		box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+		min-width: 280px;
+	}
+	.image-change-title {
+		margin: 0 0 1rem 0;
+		font-size: 1.1rem;
+		font-weight: 600;
+		color: var(--color-ink);
+		font-family: var(--font-display);
+	}
+	.image-change-actions {
+		display: flex;
+		gap: 0.75rem;
+		justify-content: flex-end;
+	}
+	.image-change-btn {
+		padding: 0.5rem 1rem;
+		font-size: 0.9rem;
+		font-weight: 600;
+		border-radius: 6px;
+		cursor: pointer;
+		font-family: inherit;
+		border: 1px solid rgba(0, 0, 0, 0.2);
+		background: rgba(255, 255, 255, 0.8);
+		color: var(--color-ink);
+	}
+	.image-change-yes {
+		background: var(--color-ink);
+		color: var(--color-cream);
+		border-color: var(--color-ink);
+	}
+	.image-change-input-hidden {
+		position: absolute;
+		width: 0;
+		height: 0;
+		opacity: 0;
+	}
+	body.admin-images-editable main img {
+		cursor: pointer;
 	}
 </style>

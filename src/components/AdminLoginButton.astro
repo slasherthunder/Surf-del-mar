@@ -1,0 +1,159 @@
+---
+// Popup password gate; on success redirects to /admin.
+const allowedPassword = 'surfdelmar';
+---
+<button type="button" class="admin-login-btn" id="admin-login-trigger" aria-haspopup="dialog" aria-controls="admin-login-modal">Admin Login</button>
+
+<div id="admin-login-modal" class="admin-login-modal" role="dialog" aria-labelledby="admin-login-title" aria-modal="true" hidden>
+	<div class="admin-login-overlay" id="admin-login-overlay"></div>
+	<div class="admin-login-box">
+		<h2 id="admin-login-title" class="admin-login-title">Admin Login</h2>
+		<form id="admin-login-form" class="admin-login-form">
+			<label for="admin-password" class="admin-login-label">Password</label>
+			<input type="password" id="admin-password" name="password" class="admin-login-input" autocomplete="current-password" required />
+			<p id="admin-login-error" class="admin-login-error" aria-live="polite" hidden>Incorrect password.</p>
+			<div class="admin-login-actions">
+				<button type="button" class="admin-login-btn admin-login-cancel" id="admin-login-cancel">Cancel</button>
+				<button type="submit" class="admin-login-btn admin-login-submit">Log in</button>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script define:vars={{ allowedPassword }}>
+	const trigger = document.getElementById('admin-login-trigger');
+	const modal = document.getElementById('admin-login-modal');
+	const overlay = document.getElementById('admin-login-overlay');
+	const form = document.getElementById('admin-login-form');
+	const passwordInput = document.getElementById('admin-password');
+	const errorEl = document.getElementById('admin-login-error');
+	const cancelBtn = document.getElementById('admin-login-cancel');
+
+	function openModal() {
+		modal.hidden = false;
+		passwordInput.value = '';
+		errorEl.hidden = true;
+		passwordInput.focus();
+	}
+
+	function closeModal() {
+		modal.hidden = true;
+	}
+
+	trigger?.addEventListener('click', openModal);
+	overlay?.addEventListener('click', closeModal);
+	cancelBtn?.addEventListener('click', closeModal);
+
+	form?.addEventListener('submit', (e) => {
+		e.preventDefault();
+		if (passwordInput.value === allowedPassword) {
+			sessionStorage.setItem('admin', 'true');
+			closeModal();
+			window.dispatchEvent(new CustomEvent('admin-login'));
+		} else {
+			errorEl.hidden = false;
+			passwordInput.focus();
+		}
+	});
+</script>
+
+<style>
+	.admin-login-btn {
+		display: inline-block;
+		padding: 0.4rem 0.9rem;
+		font-size: 0.75rem;
+		font-weight: 600;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		text-decoration: none;
+		color: var(--color-ink);
+		background: rgba(255, 255, 255, 0.4);
+		border: 1px solid rgba(0, 0, 0, 0.15);
+		border-radius: 6px;
+		cursor: pointer;
+		transition: background 0.2s ease, border-color 0.2s ease;
+		font-family: inherit;
+	}
+	.admin-login-btn:hover {
+		background: rgba(255, 255, 255, 0.6);
+		border-color: rgba(0, 0, 0, 0.25);
+	}
+
+	.admin-login-modal {
+		position: fixed;
+		inset: 0;
+		z-index: 9999;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 1rem;
+	}
+	.admin-login-modal[hidden] {
+		display: none;
+	}
+	.admin-login-overlay {
+		position: absolute;
+		inset: 0;
+		background: rgba(0, 0, 0, 0.5);
+	}
+	.admin-login-box {
+		position: relative;
+		background: var(--color-cream);
+		border-radius: 12px;
+		padding: 1.5rem 1.75rem;
+		box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+		border: 1px solid rgba(0, 0, 0, 0.08);
+		min-width: 280px;
+	}
+	.admin-login-title {
+		margin: 0 0 1rem 0;
+		font-size: 1.1rem;
+		font-weight: 600;
+		color: var(--color-ink);
+		font-family: var(--font-display);
+	}
+	.admin-login-form {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+	.admin-login-label {
+		font-size: 0.85rem;
+		font-weight: 600;
+		color: var(--color-ink);
+	}
+	.admin-login-input {
+		padding: 0.5rem 0.75rem;
+		border: 1px solid rgba(0, 0, 0, 0.2);
+		border-radius: 6px;
+		font-size: 1rem;
+		font-family: inherit;
+	}
+	.admin-login-input:focus {
+		outline: 2px solid var(--color-accent);
+		outline-offset: 1px;
+	}
+	.admin-login-error {
+		margin: 0;
+		font-size: 0.85rem;
+		color: #b91c1c;
+	}
+	.admin-login-actions {
+		display: flex;
+		gap: 0.75rem;
+		justify-content: flex-end;
+		margin-top: 0.25rem;
+	}
+	.admin-login-cancel {
+		background: transparent;
+	}
+	.admin-login-submit {
+		background: var(--color-ink);
+		color: var(--color-cream);
+		border-color: var(--color-ink);
+	}
+	.admin-login-submit:hover {
+		background: #1a1612;
+		border-color: #1a1612;
+	}
+</style>
