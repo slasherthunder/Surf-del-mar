@@ -165,7 +165,7 @@ import Lighthouse from '../components/Lighthouse.astro';
 				containerEl.innerHTML = `<p class="shared-memories-msg shared-memories-error">Couldn't load memories. ${escapeHtml(result.error)} Check Netlify env vars (PUBLIC_FIREBASE_*) and that Firestore rules are deployed.</p>`;
 				return;
 			}
-			memoriesList = result.memories.filter((m) => m.imageUrl && m.imageUrl.startsWith('data:'));
+			memoriesList = result.memories.filter((m) => m.imageUrl && m.imageUrl.startsWith('data:') && m.approved !== false);
 			if (memoriesList.length === 0) {
 				containerEl.innerHTML = '<p class="shared-memories-msg">No memories yet. Be the first to share! If you already submitted a photo, try sharing again—earlier submissions may not have been saved.</p>';
 				return;

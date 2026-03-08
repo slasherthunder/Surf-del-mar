@@ -1,0 +1,104 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+<BaseLayout title="Maintenance Mode" description="Toggle site maintenance mode.">
+	<section class="admin-maintenance-hero">
+		<div class="container">
+			<h1 class="admin-maintenance-title">Maintenance Mode</h1>
+			<p class="admin-maintenance-desc">When enabled, visitors are redirected to the maintenance page until you turn it off.</p>
+			<div id="admin-maintenance-toggle-wrap" class="admin-maintenance-toggle-wrap" hidden>
+				<label class="admin-maintenance-label">
+					<input type="checkbox" id="admin-maintenance-checkbox" />
+					<span>Maintenance mode on</span>
+				</label>
+				<p id="admin-maintenance-status" class="admin-maintenance-status"></p>
+			</div>
+			<p id="admin-maintenance-gate" class="admin-maintenance-gate">Log in as admin to change maintenance mode.</p>
+		</div>
+	</section>
+
+	<script>
+		const ADMIN_PASSWORD = typeof import.meta.env.PUBLIC_ADMIN_PASSWORD === 'string' && import.meta.env.PUBLIC_ADMIN_PASSWORD
+			? import.meta.env.PUBLIC_ADMIN_PASSWORD
+			: 'surfdelmar';
+
+		const wrap = document.getElementById('admin-maintenance-toggle-wrap');
+		const gate = document.getElementById('admin-maintenance-gate');
+		const checkbox = document.getElementById('admin-maintenance-checkbox');
+		const statusEl = document.getElementById('admin-maintenance-status');
+
+		async function setMaintenance(enabled) {
+			const res = await fetch('/.netlify/functions/set-maintenance', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ password: ADMIN_PASSWORD, enabled }),
+			});
+			const data = await res.json().catch(() => ({}));
+			if (res.ok && data.ok) {
+				if (statusEl) statusEl.textContent = enabled ? 'On — visitors will see the maintenance page.' : 'Off — site is live.';
+				window.dispatchEvent(new CustomEvent('show-admin-toast', { detail: { message: enabled ? 'Maintenance mode on.' : 'Maintenance mode off.' } }));
+			} else {
+				if (statusEl) statusEl.textContent = data.error || 'Failed to update.';
+			}
+		}
+
+		function checkAdmin() {
+			const isAdmin = sessionStorage.getItem('admin') === 'true';
+			if (isAdmin && wrap && gate) {
+				wrap.hidden = false;
+				gate.hidden = true;
+			} else if (gate) {
+				gate.hidden = false;
+			}
+		}
+
+		async function init() {
+			checkAdmin();
+			if (sessionStorage.getItem('admin') !== 'true') return;
+			// Could fetch current state from Firestore here; for now checkbox is unchecked by default
+			if (checkbox) {
+				checkbox.addEventListener('change', () => setMaintenance(checkbox.checked));
+			}
+			if (statusEl) statusEl.textContent = 'Toggle above to turn maintenance mode on or off.';
+		}
+		init();
+		window.addEventListener('admin-login', checkAdmin);
+	</script>
+</BaseLayout>
+
+<style>
+	.admin-maintenance-hero {
+		padding: 3rem 2rem;
+		text-align: center;
+	}
+	.admin-maintenance-title {
+		font-family: var(--font-display);
+		font-size: 1.75rem;
+		font-weight: 600;
+		color: var(--color-ink);
+		margin: 0 0 0.5rem 0;
+	}
+	.admin-maintenance-desc {
+		font-size: 1rem;
+		color: var(--color-sepia);
+		margin: 0 0 1.5rem 0;
+	}
+	.admin-maintenance-toggle-wrap {
+		margin-bottom: 1rem;
+	}
+	.admin-maintenance-label {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		cursor: pointer;
+		font-weight: 600;
+	}
+	.admin-maintenance-status {
+		font-size: 0.9rem;
+		color: var(--color-sepia);
+		margin: 0.5rem 0 0 0;
+	}
+	.admin-maintenance-gate {
+		color: var(--color-sepia);
+	}
+</style>

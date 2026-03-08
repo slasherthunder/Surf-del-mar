@@ -18,15 +18,57 @@ function getFirebaseApp(): FirebaseApp {
   return getApp();
 }
 
-export async function getSchedule(): Promise<{ day: string; events: { title: string; venue: string; time: string; advocacy: boolean }[] }[] | null> {
+/** New schedule format: flat events with audit fields */
+export interface ScheduleEvent {
+  id: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  title: string;
+  venue: string;
+  category: string;
+  description?: string;
+  advocacy?: boolean;
+}
+
+export interface ScheduleDoc {
+  events: ScheduleEvent[];
+  lastUpdated?: string;
+  updatedBy?: string;
+  version?: number;
+}
+
+/** Legacy format (day-based) for backward compatibility */
+export type LegacySchedule = { day: string; events: { title: string; venue: string; time: string; advocacy?: boolean }[] }[];
+
+export type GetScheduleResult = { events: ScheduleEvent[]; lastUpdated?: string; version?: number } | { legacy: LegacySchedule } | null;
+
+export async function getSchedule(): Promise<GetScheduleResult> {
   if (!import.meta.env.PUBLIC_FIREBASE_PROJECT_ID) return null;
   try {
     const db = getFirestore(getFirebaseApp());
     const snap = await getDoc(doc(db, 'content', 'schedule'));
     const data = snap.data();
-    return data?.data ?? null;
+    if (!data) return null;
+    if (Array.isArray(data.events)) {
+      return { events: data.events, lastUpdated: data.lastUpdated, version: data.version };
+    }
+    if (Array.isArray(data.data)) return { legacy: data.data };
+    return null;
   } catch {
     return null;
+  }
+}
+
+export async function getMaintenanceMode(): Promise<boolean> {
+  if (!import.meta.env.PUBLIC_FIREBASE_PROJECT_ID) return false;
+  try {
+    const db = getFirestore(getFirebaseApp());
+    const snap = await getDoc(doc(db, 'content', 'maintenanceMode'));
+    const data = snap.data();
+    return !!(data?.enabled);
+  } catch {
+    return false;
   }
 }
 
@@ -49,6 +91,8 @@ export interface SharedMemory {
   name: string;
   submittedAt: { seconds: number } | null;
   likes: number;
+  /** If false, hidden from public; missing or true = shown */
+  approved?: boolean;
 }
 
 export type GetSharedMemoriesResult =
@@ -73,6 +117,7 @@ export async function getSharedMemories(): Promise<GetSharedMemoriesResult> {
         name: String(data.name ?? ''),
         submittedAt,
         likes: Number(data.likes ?? 0),
+        approved: data.approved === false ? false : true,
       };
     });
     list.sort((a, b) => {

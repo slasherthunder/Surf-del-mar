@@ -1,3 +1,7 @@
+/**
+ * Removes a single image override (revert to original).
+ * Requires ADMIN_PASSWORD. Writes updatedAt, updatedBy for audit.
+ */
 const admin = require('firebase-admin');
 
 function getAdmin() {
@@ -9,8 +13,6 @@ function getAdmin() {
   return admin;
 }
 
-// Saves image overrides in Firestore only (no Firebase Storage). Data URLs are stored in content/imageOverrides.
-// Note: Firestore document limit is 1MB; keep image count/size modest or you may need to split into a collection.
 exports.handler = async (event, context) => {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: JSON.stringify({ error: 'Method not allowed' }) };
@@ -28,40 +30,44 @@ exports.handler = async (event, context) => {
   if (body.password !== expectedPassword) {
     return { statusCode: 403, body: JSON.stringify({ error: 'Unauthorized' }) };
   }
-  let { originalSrc, fileBase64, contentType } = body;
-  if (!originalSrc || !fileBase64) {
-    return { statusCode: 400, body: JSON.stringify({ error: 'originalSrc and fileBase64 required' }) };
+  let { originalSrc } = body;
+  if (!originalSrc || typeof originalSrc !== 'string') {
+    return { statusCode: 400, body: JSON.stringify({ error: 'originalSrc required' }) };
   }
-  // Normalize to pathname so keys match between upload and revert (e.g. /surfers.jpg)
+  // Normalize to pathname so key matches regardless of origin (e.g. /surfers.jpg)
   try {
     const u = new URL(originalSrc, 'https://x');
     originalSrc = u.pathname || originalSrc;
   } catch (_) {
-    if (!originalSrc.startsWith('/')) originalSrc = '/' + originalSrc.replace(/^\/+/, '');
+    if (originalSrc.startsWith('/')) {
+      // already path-like
+    } else {
+      originalSrc = '/' + originalSrc.replace(/^\/+/, '');
+    }
   }
   try {
-    const dataUrl = `data:${contentType || 'image/jpeg'};base64,${fileBase64}`;
     const app = getAdmin();
     const db = app.firestore();
     const ref = db.doc('content/imageOverrides');
     const snap = await ref.get();
-    const overrides = (snap.exists && snap.data().overrides) ? { ...snap.data().overrides } : {};
-    overrides[originalSrc] = dataUrl;
+    const data = snap.exists ? snap.data() : {};
+    const overrides = data.overrides && typeof data.overrides === 'object' ? { ...data.overrides } : {};
+    delete overrides[originalSrc];
+    if (body.originalSrcRaw && body.originalSrcRaw !== originalSrc) {
+      delete overrides[body.originalSrcRaw];
+    }
     const now = new Date().toISOString();
-    await ref.set(
-      { overrides, updatedAt: now, updatedBy: 'admin' },
-      { merge: true }
-    );
+    await ref.set({ overrides, updatedAt: now, updatedBy: 'admin' }, { merge: true });
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url: dataUrl }),
+      body: JSON.stringify({ ok: true }),
     };
   } catch (err) {
     console.error(err);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: err.message || 'Save failed' }),
+      body: JSON.stringify({ error: err.message || 'Failed to revert' }),
     };
   }
 };

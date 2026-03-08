@@ -1,26 +1,25 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import type { ScheduleEvent } from '../lib/firebase';
 
-const initialSchedule = [
-	{ day: "Thursday, October 8th", events: [
-		{ title: "Opening Reception — Meet and Greet · Surfing Art Walk · Music by Peter Sprague and group", venue: "Del Mar Plaza", time: "3:00 pm to 6:30 pm", advocacy: false },
-		{ title: "Climate Change / Conservation Symposium", venue: "St. Peter's Hall", time: "10:00 am to 3:00 pm", advocacy: true }
-	]},
-	{ day: "Friday, October 9th", events: [
-		{ title: "Surfing Film Festival", venue: "St. Peter's Hall", time: "11:00 am to 5:00 pm (Daytime) · 6:00 pm to 9:00 pm (Evening)", advocacy: false }
-	]},
-	{ day: "Saturday, October 10th", events: [
-		{ title: "Surfer's Reunion", venue: "Powerhouse Park", time: "11:00 am to 9:00 pm", advocacy: false },
-		{ title: "Surfwriter's Book Fair", venue: "TBD", time: "10:00 am to 3:00 pm", advocacy: false },
-		{ title: "Woody Wagon Parade Through Del Mar and Display", venue: "Del Mar Train Station", time: "11:00 am to 3:00 pm", advocacy: false },
-		{ title: "Afternoon Concert with The MarDels", venue: "Powerhouse Park", time: "2:00 pm to 4:30 pm", advocacy: false },
-		{ title: "VIP Reception", venue: "Community Room at Powerhouse Park", time: "5:00 pm to 7:00 pm", advocacy: false },
-		{ title: "Film Presentation: Endless Summer", venue: "Powerhouse Park Stage", time: "6:00 pm to 9:00 pm", advocacy: false }
-	]},
-	{ day: "Sunday, October 11th", events: [
-		{ title: "Surfwriter's Book Fair", venue: "TBD", time: "10:00 am to 3:00 pm", advocacy: false },
-		{ title: "Student Art Walk", venue: "TBD", time: "10:00 am to 3:00 pm", advocacy: false }
-	]}
+const EVENT_CATEGORIES = ['General', 'Music', 'Film', 'Symposium', 'Reunion', 'Exhibition', 'Parade', 'Reception', 'Other'];
+
+function makeId() {
+  return `ev-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+}
+
+const initialEvents: ScheduleEvent[] = [
+  { id: makeId(), date: '2026-10-08', startTime: '15:00', endTime: '18:30', title: 'Opening Reception — Meet and Greet · Surfing Art Walk · Music by Peter Sprague and group', venue: 'Del Mar Plaza', category: 'Reception', description: '', advocacy: false },
+  { id: makeId(), date: '2026-10-08', startTime: '10:00', endTime: '15:00', title: 'Climate Change / Conservation Symposium', venue: "St. Peter's Hall", category: 'Symposium', description: '', advocacy: true },
+  { id: makeId(), date: '2026-10-09', startTime: '11:00', endTime: '17:00', title: 'Surfing Film Festival', venue: "St. Peter's Hall", category: 'Film', description: 'Daytime 11am–5pm · Evening 6pm–9pm', advocacy: false },
+  { id: makeId(), date: '2026-10-10', startTime: '11:00', endTime: '21:00', title: "Surfer's Reunion", venue: 'Powerhouse Park', category: 'Reunion', description: '', advocacy: false },
+  { id: makeId(), date: '2026-10-10', startTime: '10:00', endTime: '15:00', title: "Surfwriter's Book Fair", venue: 'TBD', category: 'Exhibition', description: '', advocacy: false },
+  { id: makeId(), date: '2026-10-10', startTime: '11:00', endTime: '15:00', title: 'Woody Wagon Parade Through Del Mar and Display', venue: 'Del Mar Train Station', category: 'Parade', description: '', advocacy: false },
+  { id: makeId(), date: '2026-10-10', startTime: '14:00', endTime: '16:30', title: 'Afternoon Concert with The MarDels', venue: 'Powerhouse Park', category: 'Music', description: '', advocacy: false },
+  { id: makeId(), date: '2026-10-10', startTime: '17:00', endTime: '19:00', title: 'VIP Reception', venue: 'Community Room at Powerhouse Park', category: 'Reception', description: '', advocacy: false },
+  { id: makeId(), date: '2026-10-10', startTime: '18:00', endTime: '21:00', title: 'Film Presentation: Endless Summer', venue: 'Powerhouse Park Stage', category: 'Film', description: '', advocacy: false },
+  { id: makeId(), date: '2026-10-11', startTime: '10:00', endTime: '15:00', title: "Surfwriter's Book Fair", venue: 'TBD', category: 'Exhibition', description: '', advocacy: false },
+  { id: makeId(), date: '2026-10-11', startTime: '10:00', endTime: '15:00', title: 'Student Art Walk', venue: 'TBD', category: 'Exhibition', description: '', advocacy: false },
 ];
 ---
 
@@ -35,157 +34,486 @@ const initialSchedule = [
 
 	<section class="schedule-content">
 		<div class="container schedule-inner" id="schedule-edit-root">
-			<div class="schedule-day">
-				<h2 class="schedule-day-title">Thursday, October 8<sup>th</sup></h2>
-				<article class="event-card">
-					<h3>Opening Reception — Meet and Greet · Surfing Art Walk · Music by Peter Sprague and group</h3>
-					<p class="schedule-meta"><strong>Venue:</strong> Del Mar Plaza<br/><strong>Time:</strong> 3:00 pm to 6:30 pm</p>
-				</article>
-				<article class="event-card event-card-advocacy">
-					<h3>Climate Change / Conservation Symposium</h3>
-					<p class="schedule-meta"><strong>Venue:</strong> St. Peter's Hall<br/><strong>Time:</strong> 10:00 am to 3:00 pm</p>
-				</article>
-			</div>
-
-			<div class="schedule-day">
-				<h2 class="schedule-day-title">Friday, October 9<sup>th</sup></h2>
-				<article class="event-card">
-					<h3>Surfing Film Festival</h3>
-					<p class="schedule-meta"><strong>Venue:</strong> St. Peter's Hall<br/><strong>Time:</strong> 11:00 am to 5:00 pm (Daytime) · 6:00 pm to 9:00 pm (Evening)</p>
-				</article>
-			</div>
-
-			<div class="schedule-day">
-				<h2 class="schedule-day-title">Saturday, October 10<sup>th</sup></h2>
-				<article class="event-card">
-					<h3>Surfer's Reunion</h3>
-					<p class="schedule-meta"><strong>Venue:</strong> Powerhouse Park<br/><strong>Time:</strong> 11:00 am to 9:00 pm</p>
-				</article>
-				<article class="event-card">
-					<h3>Surfwriter's Book Fair</h3>
-					<p class="schedule-meta"><strong>Venue:</strong> TBD<br/><strong>Time:</strong> 10:00 am to 3:00 pm</p>
-				</article>
-				<article class="event-card">
-					<h3>Woody Wagon Parade Through Del Mar and Display</h3>
-					<p class="schedule-meta"><strong>Venue:</strong> Del Mar Train Station<br/><strong>Time:</strong> 11:00 am to 3:00 pm</p>
-				</article>
-				<article class="event-card">
-					<h3>Afternoon Concert with The MarDels</h3>
-					<p class="schedule-meta"><strong>Venue:</strong> Powerhouse Park<br/><strong>Time:</strong> 2:00 pm to 4:30 pm</p>
-				</article>
-				<article class="event-card">
-					<h3>VIP Reception</h3>
-					<p class="schedule-meta"><strong>Venue:</strong> Community Room at Powerhouse Park<br/><strong>Time:</strong> 5:00 pm to 7:00 pm</p>
-				</article>
-				<article class="event-card">
-					<h3>Film Presentation: <em>Endless Summer</em></h3>
-					<p class="schedule-meta"><strong>Venue:</strong> Powerhouse Park Stage<br/><strong>Time:</strong> 6:00 pm to 9:00 pm</p>
-				</article>
-			</div>
-
-			<div class="schedule-day">
-				<h2 class="schedule-day-title">Sunday, October 11<sup>th</sup></h2>
-				<article class="event-card">
-					<h3>Surfwriter's Book Fair</h3>
-					<p class="schedule-meta"><strong>Venue:</strong> TBD<br/><strong>Time:</strong> 10:00 am to 3:00 pm</p>
-				</article>
-				<article class="event-card">
-					<h3>Student Art Walk</h3>
-					<p class="schedule-meta"><strong>Venue:</strong> TBD<br/><strong>Time:</strong> 10:00 am to 3:00 pm</p>
-				</article>
-			</div>
+			<!-- Filled by script -->
 		</div>
 	</section>
 
-	<script id="schedule-initial" type="application/json" set:html={JSON.stringify(initialSchedule)}></script>
+	<script id="schedule-config" type="application/json" set:html={JSON.stringify({ initialEvents, categories: EVENT_CATEGORIES })}></script>
 	<script>
 		import { getSchedule } from '../lib/firebase';
 
 		const root = document.getElementById('schedule-edit-root');
-		const initialEl = document.getElementById('schedule-initial');
-		const initialSchedule = initialEl ? JSON.parse(initialEl.textContent || '[]') : [];
+		const configEl = document.getElementById('schedule-config');
+		const config = configEl ? JSON.parse(configEl.textContent || '{}') : { initialEvents: [], categories: ['General'] };
+		const INITIAL_EVENTS = config.initialEvents || [];
+		const CATEGORIES = config.categories || ['General'];
 		const ADMIN_PASSWORD = typeof import.meta.env.PUBLIC_ADMIN_PASSWORD === 'string' && import.meta.env.PUBLIC_ADMIN_PASSWORD
 			? import.meta.env.PUBLIC_ADMIN_PASSWORD
 			: 'surfdelmar';
+		const DRAFT_KEY = 'surf-del-mar-schedule-draft';
+		const DRAFT_TIMESTAMP_KEY = 'surf-del-mar-schedule-draft-at';
 
 		function escapeHtml(s) {
 			const div = document.createElement('div');
-			div.textContent = s;
+			div.textContent = s ?? '';
 			return div.innerHTML;
 		}
 
-		function renderSchedule(schedule, showEdit) {
+		function formatTime24to12(t) {
+			if (!t) return '';
+			const [h, m] = t.split(':').map(Number);
+			const period = h >= 12 ? 'pm' : 'am';
+			const h12 = h % 12 || 12;
+			return `${h12}:${String(m || 0).padStart(2, '0')} ${period}`;
+		}
+
+		function formatDate(dateStr) {
+			if (!dateStr) return '';
+			const d = new Date(dateStr + 'T12:00:00');
+			const ord = (n) => {
+				const s = ['th', 'st', 'nd', 'rd'];
+				const v = n % 100;
+				return s[(v - 20) % 10] || s[v] || s[0];
+			};
+			const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+			const month = d.toLocaleString('en', { month: 'long' });
+			const dayNum = d.getDate();
+			return `${days[d.getDay()]}, ${month} ${dayNum}${ord(dayNum)}`;
+		}
+
+		function legacyToEvents(legacy) {
+			if (!Array.isArray(legacy)) return [];
+			const makeId = () => `ev-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+			const events = [];
+			const parseTime = (s) => {
+				const m = (s || '').match(/(\d{1,2}):?(\d{2})?\s*(am|pm)/i);
+				if (!m) return null;
+				let h = parseInt(m[1], 10);
+				const min = parseInt(m[2] || '0', 10);
+				if ((m[3] || '').toLowerCase() === 'pm' && h < 12) h += 12;
+				if ((m[3] || '').toLowerCase() === 'am' && h === 12) h = 0;
+				return `${String(h).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
+			};
+			for (const day of legacy) {
+				const dayStr = day.day || '';
+				const dateMatch = dayStr.match(/(\d{1,2})\D*(\d{1,2})?(?:\D*(\d{4}))?/);
+				const date = dateMatch ? `${dateMatch[3] || '2026'}-10-${String(parseInt(dateMatch[1], 10)).padStart(2, '0')}` : '2026-10-08';
+				for (const ev of day.events || []) {
+					const timeStr = ev.time || '';
+					const parts = timeStr.split(/\s+to\s+|\s*[-–—]\s*|·/i).map(p => p.trim()).filter(Boolean);
+					const start = parseTime(parts[0]) || '09:00';
+					const end = parseTime(parts[1]) || '17:00';
+					events.push({
+						id: ev.id || makeId(),
+						date,
+						startTime: ev.startTime || start,
+						endTime: ev.endTime || end,
+						title: ev.title || '',
+						venue: ev.venue || 'TBD',
+						category: ev.category || 'General',
+						description: ev.description || '',
+						advocacy: !!ev.advocacy,
+					});
+				}
+			}
+			return events;
+		}
+
+		function groupByDate(events) {
+			const byDate = {};
+			for (const e of events) {
+				const d = e.date || '2026-10-08';
+				if (!byDate[d]) byDate[d] = [];
+				byDate[d].push(e);
+			}
+			for (const arr of Object.values(byDate)) {
+				arr.sort((a, b) => (a.startTime || '').localeCompare(b.startTime || ''));
+			}
+			return byDate;
+		}
+
+		function validateEvent(ev) {
+			const errs = [];
+			if (!(ev.title || '').trim()) errs.push('Title is required');
+			if (!(ev.venue || '').trim()) errs.push('Venue is required');
+			const s = (ev.startTime || '').replace(/:/g, '');
+			const e = (ev.endTime || '').replace(/:/g, '');
+			if (s && e && s >= e) errs.push('Start time must be before end time');
+			return errs;
+		}
+
+		function validateAll(events) {
+			let ok = true;
+			for (const ev of events) {
+				if (validateEvent(ev).length) ok = false;
+			}
+			return ok;
+		}
+
+		function saveDraft(events) {
+			try {
+				localStorage.setItem(DRAFT_KEY, JSON.stringify(events));
+				localStorage.setItem(DRAFT_TIMESTAMP_KEY, String(Date.now()));
+			} catch (_) {}
+		}
+
+		function loadDraft() {
+			try {
+				const raw = localStorage.getItem(DRAFT_KEY);
+				const at = localStorage.getItem(DRAFT_TIMESTAMP_KEY);
+				if (raw && at) return { events: JSON.parse(raw), at: Number(at) };
+			} catch (_) {}
+			return null;
+		}
+
+		function render(events, options) {
 			if (!root) return;
-			root.innerHTML = schedule.map((day, dayIdx) => `
-				<div class="schedule-day" data-day="${dayIdx}">
-					<h2 class="schedule-day-title">${day.day.replace(/(\d+)(th|st|nd|rd)/i, '$1<sup>$2</sup>')}</h2>
-					${day.events.map((ev, evIdx) => `
-						<article class="event-card ${ev.advocacy ? 'event-card-advocacy' : ''}" data-day="${dayIdx}" data-event="${evIdx}">
-							${showEdit ? `<div class="event-card-edit-row"><h3>${escapeHtml(ev.title)}</h3><button type="button" class="event-delete-btn" aria-label="Delete event">×</button></div><p class="schedule-meta"><strong>Venue:</strong> ${escapeHtml(ev.venue)}<br/><strong>Time:</strong> ${escapeHtml(ev.time)}</p>` : `<h3>${escapeHtml(ev.title)}</h3><p class="schedule-meta"><strong>Venue:</strong> ${escapeHtml(ev.venue)}<br/><strong>Time:</strong> ${escapeHtml(ev.time)}</p>`}
-						</article>
-					`).join('')}
-				</div>
-			`).join('') + (showEdit ? `
-				<div class="schedule-edit-actions">
-					<button type="button" class="btn btn-primary" id="schedule-add-event">Add event</button>
-					<button type="button" class="btn btn-primary" id="schedule-save">Save changes</button>
-				</div>
-			` : '');
+			const showEdit = options.showEdit !== false;
+			const previewMode = options.previewMode === true;
+			const errors = options.errors || {};
+			const byDate = groupByDate(events);
+			const dates = Object.keys(byDate).sort();
+
+			const timeInput = (ev, field) => {
+				if (!showEdit || previewMode) return escapeHtml(formatTime24to12(ev[field]));
+				const val = ev[field] || '';
+				return `<input type="time" class="schedule-input schedule-time" data-id="${escapeHtml(ev.id)}" data-field="${field}" value="${escapeHtml(val)}" step="300" />`;
+			};
+
+			const catSelect = (ev) => {
+				if (!showEdit || previewMode) return escapeHtml(ev.category || 'General');
+				const opts = CATEGORIES.map(c => `<option value="${escapeHtml(c)}" ${(ev.category || '') === c ? 'selected' : ''}>${escapeHtml(c)}</option>`).join('');
+				return `<select class="schedule-input schedule-select" data-id="${escapeHtml(ev.id)}" data-field="category">${opts}</select>`;
+			};
+
+			let html = '';
+			if (showEdit && previewMode) {
+				html += `
+					<div class="schedule-toolbar schedule-preview-bar">
+						<button type="button" class="btn btn-primary" id="schedule-back-to-edit">Back to edit mode</button>
+					</div>`;
+			}
+			if (showEdit && !previewMode) {
+				html += `
+					<div class="schedule-toolbar">
+						<label class="schedule-preview-toggle"><input type="checkbox" id="schedule-preview-mode" /> Preview mode</label>
+						<button type="button" class="btn btn-outline" id="schedule-undo" title="Undo">Undo</button>
+						<button type="button" class="btn btn-outline" id="schedule-redo" title="Redo">Redo</button>
+						<button type="button" class="btn btn-primary" id="schedule-add-event">Add event</button>
+						<button type="button" class="btn btn-outline" id="schedule-reset">Reset to original</button>
+						<button type="button" class="btn btn-primary" id="schedule-save">
+							<span class="schedule-save-text">Save changes</span>
+							<span class="schedule-spinner" hidden aria-hidden="true"></span>
+						</button>
+						<span class="schedule-last-saved" id="schedule-last-saved"></span>
+					</div>`;
+			}
+			if (options.lastUpdated) {
+				const el = document.getElementById('schedule-last-saved');
+				if (el) el.textContent = `Last saved: ${new Date(options.lastUpdated).toLocaleString()}`;
+			}
+
+			for (const date of dates) {
+				const dayEvents = byDate[date];
+				const dayTitleHtml = showEdit && !previewMode
+					? `<input type="date" class="schedule-input schedule-day-date" data-date="${escapeHtml(date)}" value="${escapeHtml(date)}" />`
+					: `<h2 class="schedule-day-title">${escapeHtml(formatDate(date))}</h2>`;
+				html += `<div class="schedule-day" data-date="${escapeHtml(date)}">
+					${dayTitleHtml}
+					<div class="schedule-day-events">`;
+				for (const ev of dayEvents) {
+					const err = (errors[ev.id] || []).join('; ');
+					const errClass = err ? ' schedule-event-has-error' : '';
+					const advClass = ev.advocacy ? ' event-card-advocacy' : '';
+					html += `
+						<article class="event-card${advClass}${errClass}" data-id="${escapeHtml(ev.id)}" data-date="${escapeHtml(date)}" draggable="${showEdit && !previewMode ? 'true' : 'false'}">
+							${showEdit && !previewMode ? `<span class="event-drag-handle" aria-label="Drag to reorder">⋮⋮</span>` : ''}
+							<div class="event-card-body">
+								${showEdit && !previewMode
+									? `<input type="text" class="schedule-input schedule-title" data-id="${escapeHtml(ev.id)}" data-field="title" value="${escapeHtml(ev.title || '')}" placeholder="Event title" />`
+									: `<h3>${escapeHtml(ev.title || '')}</h3>`}
+								${err ? `<p class="schedule-error" role="alert">${escapeHtml(err)}</p>` : ''}
+								<p class="schedule-meta">
+									${showEdit && !previewMode
+										? `<label>Venue <input type="text" class="schedule-input schedule-venue" data-id="${escapeHtml(ev.id)}" data-field="venue" value="${escapeHtml(ev.venue || '')}" placeholder="Venue" /></label>`
+										: `<strong>Venue:</strong> ${escapeHtml(ev.venue || '')}`}
+									<br/>
+									<strong>Time:</strong> ${timeInput(ev, 'startTime')} – ${timeInput(ev, 'endTime')}
+									${showEdit && !previewMode ? `<span class="schedule-meta-cat"> · ${catSelect(ev)}</span>` : (ev.category ? ` · ${escapeHtml(ev.category)}` : '')}
+								</p>
+								${(ev.description || '') && (showEdit && !previewMode) ? `<input type="text" class="schedule-input schedule-desc" data-id="${escapeHtml(ev.id)}" data-field="description" value="${escapeHtml(ev.description || '')}" placeholder="Description (optional)" />` : ''}
+								${(ev.description || '') && (showEdit === false || previewMode) ? `<p class="schedule-desc-text">${escapeHtml(ev.description)}</p>` : ''}
+								${showEdit && !previewMode ? `<button type="button" class="event-delete-btn" aria-label="Delete event">×</button>` : ''}
+							</div>
+						</article>`;
+				}
+				html += `</div></div>`;
+			}
+			root.innerHTML = html;
+		}
+
+		function getEventById(events, id) {
+			return events.find(e => e.id === id);
+		}
+
+		function updateEvent(events, id, field, value) {
+			const ev = getEventById(events, id);
+			if (ev) ev[field] = value;
+			return [...events];
+		}
+
+		function reattach(events, state) {
+			const pushState = () => {
+				state.undoStack.push(JSON.stringify(events));
+				if (state.undoStack.length > 50) state.undoStack.shift();
+				state.redoStack = [];
+				saveDraft(events);
+			};
+			const setEvents = (next) => {
+				state.events = next;
+				render(state.events, { showEdit: true, previewMode: state.previewMode, errors: state.errors, lastUpdated: state.lastUpdated });
+				reattach(state.events, state);
+			};
+
+			root.querySelectorAll('.schedule-input').forEach(input => {
+				const id = input.dataset.id;
+				const field = input.dataset.field;
+				if (!id || !field) return;
+				const ev = getEventById(events, id);
+				if (!ev) return;
+				input.addEventListener('change', () => {
+					const val = input.value;
+					pushState();
+					setEvents(updateEvent(state.events, id, field, val));
+				});
+				input.addEventListener('input', () => {
+					ev[field] = input.value;
+					saveDraft(state.events);
+				});
+			});
+
+			root.querySelectorAll('.event-delete-btn').forEach(btn => {
+				btn.addEventListener('click', () => {
+					const card = btn.closest('.event-card');
+					const id = card?.dataset.id;
+					if (!id) return;
+					pushState();
+					setEvents(state.events.filter(e => e.id !== id));
+				});
+			});
+
+			document.getElementById('schedule-back-to-edit')?.addEventListener('click', () => {
+				state.previewMode = false;
+				render(state.events, { showEdit: true, previewMode: false, errors: state.errors, lastUpdated: state.lastUpdated });
+				reattach(state.events, state);
+			});
+
+			const previewCheck = document.getElementById('schedule-preview-mode');
+			if (previewCheck) {
+				previewCheck.checked = state.previewMode;
+				previewCheck.addEventListener('change', () => {
+					state.previewMode = previewCheck.checked;
+					render(state.events, { showEdit: true, previewMode: state.previewMode, errors: state.errors, lastUpdated: state.lastUpdated });
+					reattach(state.events, state);
+				});
+			}
+
+			root.querySelectorAll('.schedule-day-date').forEach(input => {
+				input.addEventListener('change', () => {
+					const oldDate = input.dataset.date;
+					const newDate = (input as HTMLInputElement).value;
+					if (!oldDate || !newDate || oldDate === newDate) return;
+					pushState();
+					const next = state.events.map(ev => ev.date === oldDate ? { ...ev, date: newDate } : ev);
+					setEvents(next);
+				});
+			});
+
+			document.getElementById('schedule-reset')?.addEventListener('click', () => {
+				if (!state.originalEvents) return;
+				if (!confirm('Reset to the last loaded schedule? Unsaved edits will be lost.')) return;
+				pushState();
+				setEvents(JSON.parse(JSON.stringify(state.originalEvents)));
+			});
+
+			document.getElementById('schedule-undo')?.addEventListener('click', () => {
+				if (state.undoStack.length === 0) return;
+				const prev = state.undoStack.pop();
+				state.redoStack.push(JSON.stringify(state.events));
+				state.events = JSON.parse(prev);
+				render(state.events, { showEdit: true, previewMode: state.previewMode, errors: state.errors, lastUpdated: state.lastUpdated });
+				reattach(state.events, state);
+			});
+
+			document.getElementById('schedule-redo')?.addEventListener('click', () => {
+				if (state.redoStack.length === 0) return;
+				const next = state.redoStack.pop();
+				state.undoStack.push(JSON.stringify(state.events));
+				state.events = JSON.parse(next);
+				render(state.events, { showEdit: true, previewMode: state.previewMode, errors: state.errors, lastUpdated: state.lastUpdated });
+				reattach(state.events, state);
+			});
+
+			document.getElementById('schedule-add-event')?.addEventListener('click', () => {
+				const dateStr = prompt('Date (YYYY-MM-DD)', '2026-10-10');
+				if (!dateStr) return;
+				const date = dateStr.match(/^\d{4}-\d{2}-\d{2}$/) ? dateStr : '2026-10-10';
+				pushState();
+				const newEv = {
+					id: `ev-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+					date,
+					startTime: '10:00',
+					endTime: '12:00',
+					title: 'New Event',
+					venue: 'TBD',
+					category: 'General',
+					description: '',
+					advocacy: false,
+				};
+				setEvents([...state.events, newEv]);
+			});
+
+			const saveBtn = document.getElementById('schedule-save');
+			saveBtn?.addEventListener('click', async () => {
+				const errs = {};
+				for (const ev of state.events) {
+					const e = validateEvent(ev);
+					if (e.length) errs[ev.id] = e;
+				}
+				state.errors = errs;
+				if (Object.keys(errs).length > 0) {
+					render(state.events, { showEdit: true, previewMode: state.previewMode, errors: errs, lastUpdated: state.lastUpdated });
+					reattach(state.events, state);
+					return;
+				}
+				const spinner = saveBtn?.querySelector('.schedule-spinner');
+				const saveText = saveBtn?.querySelector('.schedule-save-text');
+				if (spinner) spinner.hidden = false;
+				if (saveText) saveText.textContent = 'Saving…';
+				try {
+					const res = await fetch('/.netlify/functions/save-schedule', {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({
+							password: ADMIN_PASSWORD,
+							events: state.events.map((ev) => ({
+								id: ev.id,
+								date: ev.date,
+								startTime: ev.startTime,
+								endTime: ev.endTime,
+								title: ev.title ?? '',
+								venue: ev.venue ?? 'TBD',
+								category: ev.category ?? 'General',
+								description: ev.description ?? '',
+								advocacy: !!ev.advocacy,
+							})),
+						}),
+					});
+					const data = await res.json().catch(() => ({}));
+					if (res.ok && data.ok) {
+						state.lastUpdated = data.lastUpdated;
+						window.dispatchEvent(new CustomEvent('show-admin-toast', { detail: { message: 'Saved successfully.' } }));
+						render(state.events, { showEdit: true, previewMode: state.previewMode, errors: {}, lastUpdated: state.lastUpdated });
+						reattach(state.events, state);
+					} else {
+						const msg = data.error || `Save failed (${res.status}).`;
+						const hint = res.status === 403 ? ' Check ADMIN_PASSWORD matches PUBLIC_ADMIN_PASSWORD.'
+							: res.status === 404 ? ' Run "npx netlify dev" or deploy to Netlify.'
+							: res.status === 500 ? ' Check Netlify env: ADMIN_PASSWORD, FIREBASE_SERVICE_ACCOUNT.'
+							: '';
+						alert(msg + hint);
+					}
+				} catch (e) {
+					const errMsg = e && typeof e.message === 'string' ? e.message : 'Network or server error';
+					alert('Save failed: ' + errMsg + '. Run "npx netlify dev" or deploy to Netlify.');
+				} finally {
+					if (spinner) spinner.hidden = true;
+					if (saveText) saveText.textContent = 'Save changes';
+				}
+			});
+
+			// Drag and drop
+			let draggedEl = null;
+			let draggedId = null;
+			root.querySelectorAll('.event-card[draggable="true"]').forEach(card => {
+				card.addEventListener('dragstart', (e) => {
+					draggedEl = card;
+					draggedId = card.dataset.id;
+					e.dataTransfer?.setData('text/plain', card.dataset.id || '');
+					card.classList.add('event-dragging');
+				});
+				card.addEventListener('dragend', () => {
+					card.classList.remove('event-dragging');
+					draggedEl = null;
+					draggedId = null;
+				});
+				card.addEventListener('dragover', (e) => {
+					e.preventDefault();
+					const target = e.currentTarget;
+					if (target !== draggedEl && target.classList.contains('event-card')) {
+						target.classList.add('event-drag-over');
+					}
+				});
+				card.addEventListener('dragleave', (e) => {
+					e.currentTarget.classList.remove('event-drag-over');
+				});
+				card.addEventListener('drop', (e) => {
+					e.preventDefault();
+					e.currentTarget.classList.remove('event-drag-over');
+					if (!draggedId) return;
+					const targetCard = e.currentTarget;
+					const targetId = targetCard.dataset.id;
+					const targetDate = targetCard.dataset.date;
+					if (!targetId || targetId === draggedId) return;
+					const ev = getEventById(state.events, draggedId);
+					if (!ev) return;
+					pushState();
+					const next = state.events.filter(e => e.id !== draggedId);
+					const targetIdx = next.findIndex(e => e.id === targetId);
+					ev.date = targetDate || ev.date;
+					const insertIdx = targetIdx >= 0 ? targetIdx : next.length;
+					next.splice(insertIdx, 0, ev);
+					setEvents(next);
+				});
+			});
 		}
 
 		async function init() {
-			let schedule = initialSchedule;
+			let events = [...INITIAL_EVENTS];
+			let lastUpdated = null;
 			const fromFirebase = await getSchedule();
-			if (fromFirebase && fromFirebase.length) schedule = fromFirebase;
-			const isAdmin = sessionStorage.getItem('admin') === 'true';
-			renderSchedule(schedule, isAdmin);
-			if (!isAdmin) return;
-
-			let currentSchedule = [...schedule];
-			function reattach() {
-				root.querySelectorAll('.event-delete-btn').forEach(btn => {
-					btn.addEventListener('click', () => {
-						const card = btn.closest('.event-card');
-						const dayIdx = parseInt(card.dataset.day, 10);
-						const evIdx = parseInt(card.dataset.event, 10);
-						currentSchedule[dayIdx].events.splice(evIdx, 1);
-						renderSchedule(currentSchedule, true);
-						reattach();
-					});
-				});
-				document.getElementById('schedule-add-event')?.addEventListener('click', () => {
-					const dayStr = prompt('Day (e.g. Saturday, October 10th)');
-					if (!dayStr) return;
-					let day = currentSchedule.find(d => d.day === dayStr);
-					if (!day) {
-						day = { day: dayStr, events: [] };
-						currentSchedule.push(day);
-					}
-					const title = prompt('Event title');
-					if (!title) return;
-					const venue = prompt('Venue', 'TBD');
-					const time = prompt('Time', '');
-					day.events.push({ title, venue: venue || 'TBD', time: time || 'TBD', advocacy: false });
-					renderSchedule(currentSchedule, true);
-					reattach();
-				});
-				document.getElementById('schedule-save')?.addEventListener('click', async () => {
-					try {
-						const res = await fetch('/.netlify/functions/save-schedule', {
-							method: 'POST',
-							headers: { 'Content-Type': 'application/json' },
-							body: JSON.stringify({ password: ADMIN_PASSWORD, schedule: currentSchedule }),
-						});
-						const data = await res.json().catch(() => ({}));
-						if (res.ok) alert('Schedule saved.');
-						else alert(data.error || 'Save failed. On Netlify, check env vars: ADMIN_PASSWORD, FIREBASE_SERVICE_ACCOUNT.');
-					} catch (e) {
-						const isProd = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
-						alert(isProd ? 'Save failed. Check Netlify env vars (ADMIN_PASSWORD, FIREBASE_SERVICE_ACCOUNT).' : 'Save failed. Run "npx netlify dev" or deploy to Netlify.');
-					}
-				});
+			if (fromFirebase) {
+				if ('events' in fromFirebase && Array.isArray(fromFirebase.events)) {
+					events = fromFirebase.events;
+					lastUpdated = fromFirebase.lastUpdated || null;
+				} else if ('legacy' in fromFirebase && Array.isArray(fromFirebase.legacy)) {
+					events = legacyToEvents(fromFirebase.legacy);
+				}
 			}
-			reattach();
+			const originalEvents = JSON.parse(JSON.stringify(events));
+			const isAdmin = sessionStorage.getItem('admin') === 'true';
+			if (isAdmin) {
+				const draft = loadDraft();
+				if (draft && draft.events.length && confirm('Restore unsaved draft?')) {
+					events = draft.events;
+				}
+			}
+			const state = {
+				events,
+				originalEvents,
+				previewMode: false,
+				errors: {} as Record<string, string[]>,
+				lastUpdated,
+				undoStack: [] as string[],
+				redoStack: [] as string[],
+			};
+			render(state.events, {
+				showEdit: isAdmin,
+				previewMode: false,
+				errors: {},
+				lastUpdated: state.lastUpdated,
+			});
+			if (isAdmin) reattach(state.events, state);
 		}
 		init();
 	</script>
@@ -198,7 +526,6 @@ const initialSchedule = [
 		background: #c9bea5;
 		box-shadow: inset 0 1px 0 rgba(255,255,255,0.4);
 	}
-
 	.schedule-hero .eyebrow {
 		display: block;
 		font-size: 0.7rem;
@@ -209,7 +536,6 @@ const initialSchedule = [
 		margin-bottom: 0.5rem;
 		font-family: var(--font-body);
 	}
-
 	.schedule-hero .hero-title {
 		font-family: var(--font-display);
 		font-size: clamp(2rem, 4vw, 3rem);
@@ -218,14 +544,12 @@ const initialSchedule = [
 		margin: 0 0 0.5rem 0;
 		line-height: 1.2;
 	}
-
 	.schedule-hero .tagline {
 		font-size: 1.25rem;
 		color: var(--color-sepia);
 		margin: 0;
 		font-weight: 500;
 	}
-
 	.schedule-content {
 		position: relative;
 		z-index: 1;
@@ -233,20 +557,58 @@ const initialSchedule = [
 		background: #c9bea5;
 		box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.04);
 	}
-
 	.schedule-content .schedule-inner {
 		max-width: 820px;
 		margin: 0 auto;
 	}
-
+	.schedule-toolbar {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.75rem;
+		margin-bottom: 1.5rem;
+	}
+	.schedule-preview-bar {
+		margin-bottom: 1rem;
+	}
+	.schedule-preview-toggle {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-size: 0.9rem;
+		font-weight: 600;
+		cursor: pointer;
+	}
+	.schedule-last-saved {
+		font-size: 0.8rem;
+		color: var(--color-sepia);
+		margin-left: auto;
+	}
+	.schedule-spinner {
+		display: inline-block;
+		width: 1rem;
+		height: 1rem;
+		border: 2px solid rgba(255,255,255,0.4);
+		border-top-color: #fff;
+		border-radius: 50%;
+		animation: schedule-spin 0.7s linear infinite;
+	}
+	.schedule-spinner[hidden] { display: none !important; }
+	@keyframes schedule-spin { to { transform: rotate(360deg); } }
+	.btn-outline {
+		background: transparent;
+		border: 2px solid var(--color-ink);
+		color: var(--color-ink);
+	}
+	.btn-outline:hover {
+		background: rgba(0,0,0,0.06);
+	}
 	.schedule-day {
 		margin-bottom: 2.5rem;
 	}
-
 	.schedule-day:last-of-type {
 		margin-bottom: 2rem;
 	}
-
 	.schedule-day-title {
 		font-family: var(--font-display);
 		font-size: clamp(1.5rem, 3.5vw, 1.85rem);
@@ -257,29 +619,26 @@ const initialSchedule = [
 		text-transform: uppercase;
 		letter-spacing: 0.03em;
 	}
-
 	.schedule-day-title sup {
 		font-size: 0.6em;
 		text-transform: lowercase;
 	}
-
-	.schedule-day .event-card {
-		margin-bottom: 1rem;
-	}
-
-	.schedule-day .event-card:last-child {
-		margin-bottom: 0;
-	}
-
-	.schedule-meta {
-		font-family: var(--font-body);
-		font-size: 0.95rem;
+	.schedule-day-date {
+		font-family: var(--font-display);
+		font-size: clamp(1.25rem, 3vw, 1.6rem);
+		font-weight: 600;
 		color: var(--color-ink);
-		line-height: 1.7;
-		margin: 0.5rem 0 0 0;
-		opacity: 0.95;
+		margin: 0 0 1rem 0;
+		padding: 0.35rem 0.5rem;
+		display: block;
+		width: 100%;
+		max-width: 12rem;
 	}
-
+	.schedule-day-events {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
 	.event-card {
 		background: rgba(255, 255, 255, 0.4);
 		backdrop-filter: blur(10px);
@@ -290,13 +649,35 @@ const initialSchedule = [
 		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
 		border-left: 6px solid #8b7355;
 		transition: transform 0.3s ease, box-shadow 0.3s ease;
+		display: flex;
+		gap: 0.5rem;
+		align-items: flex-start;
 	}
-
 	.event-card:hover {
 		transform: translateX(10px);
 		box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
 	}
-
+	.event-card.event-dragging {
+		opacity: 0.6;
+	}
+	.event-card.event-drag-over {
+		border-color: var(--color-accent);
+		box-shadow: 0 0 0 2px var(--color-accent);
+	}
+	.event-card.schedule-event-has-error {
+		border-left-color: #b91c1c;
+		background: rgba(185, 28, 28, 0.08);
+	}
+	.event-drag-handle {
+		cursor: grab;
+		color: var(--color-sepia);
+		font-size: 1rem;
+		user-select: none;
+	}
+	.event-card-body {
+		flex: 1;
+		position: relative;
+	}
 	.event-card h3 {
 		font-family: var(--font-display);
 		font-size: 1.2rem;
@@ -305,25 +686,59 @@ const initialSchedule = [
 		margin: 0 0 0.6rem 0;
 		line-height: 1.3;
 	}
-
-	.event-card p {
-		font-family: var(--font-body);
+	.schedule-input {
+		width: 100%;
+		max-width: 100%;
+		padding: 0.4rem 0.5rem;
 		font-size: 1rem;
+		font-family: inherit;
+		border: 1px solid rgba(0,0,0,0.2);
+		border-radius: 6px;
+	}
+	.schedule-title { font-weight: 600; }
+	.schedule-time { width: auto; }
+	.schedule-select { width: auto; }
+	.schedule-meta-cat { margin-left: 0.25rem; }
+	.schedule-error {
+		color: #b91c1c;
+		font-size: 0.85rem;
+		margin: 0.25rem 0 0 0;
+	}
+	.schedule-meta {
+		font-family: var(--font-body);
+		font-size: 0.95rem;
 		color: var(--color-ink);
 		line-height: 1.7;
-		margin: 0;
+		margin: 0.5rem 0 0 0;
+		opacity: 0.95;
 	}
-
+	.schedule-desc-text {
+		margin: 0.5rem 0 0 0;
+		font-size: 0.9rem;
+		color: var(--color-sepia);
+	}
 	.event-card-advocacy {
 		border-left-color: #e6b800;
 		background: rgba(255, 248, 220, 0.35);
-		box-shadow: 0 4px 20px rgba(230, 184, 0, 0.08);
 	}
-
-	.event-card-advocacy:hover {
-		box-shadow: 0 8px 28px rgba(230, 184, 0, 0.12);
+	.event-delete-btn {
+		position: absolute;
+		top: 0;
+		right: 0;
+		width: 1.75rem;
+		height: 1.75rem;
+		border: none;
+		background: rgba(0,0,0,0.1);
+		color: var(--color-ink);
+		font-size: 1.25rem;
+		line-height: 1;
+		cursor: pointer;
+		border-radius: 4px;
 	}
-
+	.event-delete-btn:hover {
+		background: rgba(185, 28, 28, 0.2);
+		color: #b91c1c;
+	}
 	.btn {
 		display: inline-block;
 		padding: 0.85rem 1.75rem;
@@ -334,49 +749,15 @@ const initialSchedule = [
 		letter-spacing: 0.04em;
 		transition: transform 0.2s ease, box-shadow 0.2s ease;
 		font-family: var(--font-body);
+		cursor: pointer;
+		border: none;
 	}
-
 	.btn-primary {
 		background: var(--color-ink);
 		color: var(--color-cream);
 	}
-
 	.btn-primary:hover {
 		transform: translateY(-1px);
 		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-	}
-
-	.event-card-edit-row {
-		display: flex;
-		justify-content: space-between;
-		align-items: flex-start;
-		gap: 0.5rem;
-	}
-	.event-card-edit-row h3 {
-		flex: 1;
-		margin: 0 0 0.6rem 0;
-	}
-	.event-delete-btn {
-		flex-shrink: 0;
-		width: 1.75rem;
-		height: 1.75rem;
-		border: none;
-		background: rgba(0,0,0,0.1);
-		color: var(--color-ink);
-		font-size: 1.25rem;
-		line-height: 1;
-		cursor: pointer;
-		border-radius: 4px;
-		transition: background 0.2s ease;
-	}
-	.event-delete-btn:hover {
-		background: rgba(185, 28, 28, 0.2);
-		color: #b91c1c;
-	}
-	.schedule-edit-actions {
-		display: flex;
-		gap: 1rem;
-		margin-top: 2rem;
-		flex-wrap: wrap;
 	}
 </style>

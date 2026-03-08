@@ -1,3 +1,7 @@
+/**
+ * Admin memory moderation: approve (set approved: true) or delete.
+ * Requires ADMIN_PASSWORD.
+ */
 const admin = require('firebase-admin');
 
 function getAdmin() {
@@ -9,10 +13,13 @@ function getAdmin() {
   return admin;
 }
 
-// Public: increment like count for a shared memory. No auth.
 exports.handler = async (event, context) => {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: JSON.stringify({ error: 'Method not allowed' }) };
+  }
+  const expectedPassword = process.env.ADMIN_PASSWORD;
+  if (!expectedPassword) {
+    return { statusCode: 500, body: JSON.stringify({ error: 'Server not configured' }) };
   }
   let body;
   try {
@@ -20,45 +27,39 @@ exports.handler = async (event, context) => {
   } catch {
     return { statusCode: 400, body: JSON.stringify({ error: 'Invalid JSON' }) };
   }
-  const memoryId = body.memoryId;
-  const fingerprint = typeof body.fingerprint === 'string' ? body.fingerprint.trim().slice(0, 128) : null;
+  if (body.password !== expectedPassword) {
+    return { statusCode: 403, body: JSON.stringify({ error: 'Unauthorized' }) };
+  }
+  const { action, memoryId } = body;
   if (!memoryId || typeof memoryId !== 'string') {
     return { statusCode: 400, body: JSON.stringify({ error: 'memoryId required' }) };
+  }
+  if (action !== 'approve' && action !== 'hide' && action !== 'delete') {
+    return { statusCode: 400, body: JSON.stringify({ error: 'action must be approve, hide, or delete' }) };
   }
   try {
     const app = getAdmin();
     const db = app.firestore();
     const ref = db.collection('sharedMemories').doc(memoryId);
-    const snap = await ref.get();
-    if (!snap.exists) {
-      return { statusCode: 404, body: JSON.stringify({ error: 'Memory not found' }) };
-    }
-    const data = snap.data();
-    const current = data.likes ?? 0;
-    const likedBy = Array.isArray(data.likedBy) ? data.likedBy : [];
-    if (fingerprint && likedBy.includes(fingerprint)) {
+    if (action === 'delete') {
+      await ref.delete();
       return {
         statusCode: 200,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ likes: current, alreadyLiked: true }),
+        body: JSON.stringify({ ok: true, deleted: true }),
       };
     }
-    const next = current + 1;
-    const update = { likes: next };
-    if (fingerprint) {
-      update.likedBy = admin.firestore.FieldValue.arrayUnion(fingerprint);
-    }
-    await ref.update(update);
+    await ref.set({ approved: action === 'approve' }, { merge: true });
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ likes: next, alreadyLiked: false }),
+      body: JSON.stringify({ ok: true }),
     };
   } catch (err) {
     console.error(err);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: err.message || 'Like failed' }),
+      body: JSON.stringify({ error: err.message || 'Failed' }),
     };
   }
 };

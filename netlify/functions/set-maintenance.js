@@ -1,3 +1,7 @@
+/**
+ * Set maintenance mode on/off. Requires ADMIN_PASSWORD.
+ * When enabled, the site redirects to /maintenance/ (client reads from Firestore).
+ */
 const admin = require('firebase-admin');
 
 function getAdmin() {
@@ -9,8 +13,6 @@ function getAdmin() {
   return admin;
 }
 
-// Saves image overrides in Firestore only (no Firebase Storage). Data URLs are stored in content/imageOverrides.
-// Note: Firestore document limit is 1MB; keep image count/size modest or you may need to split into a collection.
 exports.handler = async (event, context) => {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: JSON.stringify({ error: 'Method not allowed' }) };
@@ -28,40 +30,25 @@ exports.handler = async (event, context) => {
   if (body.password !== expectedPassword) {
     return { statusCode: 403, body: JSON.stringify({ error: 'Unauthorized' }) };
   }
-  let { originalSrc, fileBase64, contentType } = body;
-  if (!originalSrc || !fileBase64) {
-    return { statusCode: 400, body: JSON.stringify({ error: 'originalSrc and fileBase64 required' }) };
-  }
-  // Normalize to pathname so keys match between upload and revert (e.g. /surfers.jpg)
+  const enabled = !!body.enabled;
   try {
-    const u = new URL(originalSrc, 'https://x');
-    originalSrc = u.pathname || originalSrc;
-  } catch (_) {
-    if (!originalSrc.startsWith('/')) originalSrc = '/' + originalSrc.replace(/^\/+/, '');
-  }
-  try {
-    const dataUrl = `data:${contentType || 'image/jpeg'};base64,${fileBase64}`;
     const app = getAdmin();
     const db = app.firestore();
-    const ref = db.doc('content/imageOverrides');
-    const snap = await ref.get();
-    const overrides = (snap.exists && snap.data().overrides) ? { ...snap.data().overrides } : {};
-    overrides[originalSrc] = dataUrl;
     const now = new Date().toISOString();
-    await ref.set(
-      { overrides, updatedAt: now, updatedBy: 'admin' },
+    await db.doc('content/maintenanceMode').set(
+      { enabled, updatedAt: now, updatedBy: 'admin' },
       { merge: true }
     );
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url: dataUrl }),
+      body: JSON.stringify({ ok: true, enabled }),
     };
   } catch (err) {
     console.error(err);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: err.message || 'Save failed' }),
+      body: JSON.stringify({ error: err.message || 'Failed to update' }),
     };
   }
 };

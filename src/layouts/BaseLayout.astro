@@ -96,6 +96,7 @@ const { title, description = "Preserving and celebrating the history of Del Mar,
 				<h2 id="image-change-title" class="image-change-title">Change this image?</h2>
 				<div class="image-change-actions">
 					<button type="button" class="image-change-btn image-change-no" id="image-change-no">No</button>
+					<button type="button" class="image-change-btn image-change-revert" id="image-change-revert">Revert to original</button>
 					<label class="image-change-btn image-change-yes">
 						Yes, choose file
 						<input type="file" id="image-change-input" accept="image/*" class="image-change-input-hidden" />
@@ -104,9 +105,28 @@ const { title, description = "Preserving and celebrating the history of Del Mar,
 			</div>
 		</div>
 
+		<div id="admin-toast" class="admin-toast" role="status" aria-live="polite" hidden></div>
+
 		<script>
 			import { initAdminImages } from '../lib/admin-images';
+			import { getMaintenanceMode } from '../lib/firebase';
 			initAdminImages();
+			getMaintenanceMode().then((enabled) => {
+				if (enabled && window.location.pathname !== '/maintenance/') {
+					window.location.replace('/maintenance/');
+				}
+			});
+			window.showAdminToast = function (message) {
+				const el = document.getElementById('admin-toast');
+				if (!el) return;
+				el.textContent = message;
+				el.hidden = false;
+				clearTimeout(window._adminToastTimer);
+				window._adminToastTimer = setTimeout(() => { el.hidden = true; }, 3500);
+			};
+			window.addEventListener('show-admin-toast', (e) => {
+				window.showAdminToast(e.detail?.message ?? 'Saved.');
+			});
 		</script>
 	</body>
 </html>
@@ -465,41 +485,37 @@ const { title, description = "Preserving and celebrating the history of Del Mar,
 		}
 	}
 
-	/* Surfers Reunion nav – wave ribbon / coastal badge */
+	/* Surfers Reunion nav – same shape as surfboard, different color */
 	.nav-reunion {
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		padding: 0.6rem 1.25rem 0.75rem;
-		min-width: 140px;
+		padding: 0.5rem 2rem;
+		min-width: 160px;
 		margin-bottom: 0;
 		position: relative;
 		z-index: 2;
+		transform-style: preserve-3d;
+		clip-path: polygon(12% 0%, 75% 5%, 92% 18%, 100% 50%, 92% 82%, 75% 95%, 12% 100%, 0% 50%);
+		background: linear-gradient(to bottom, #a8d4e6 0%, #7bb8ce 45%, #57a9c7 50%, #7bb8ce 55%, #a8d4e6 100%);
 		text-transform: uppercase;
-		font-size: 0.65rem;
-		letter-spacing: 0.14em;
+		font-size: 0.7rem;
+		letter-spacing: 0.12em;
 		font-weight: 800;
-		color: var(--color-cream) !important;
+		color: #fff !important;
 		text-decoration: none;
-		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
-		transition: transform 0.4s var(--ease-coastal), box-shadow 0.4s var(--ease-coastal), filter 0.3s ease;
-		/* Wave crest shape: wavy bottom edge */
-		clip-path: polygon(0 0, 100% 0, 100% 100%, 92% 92%, 75% 100%, 50% 92%, 25% 100%, 8% 92%, 0 100%);
-		background: linear-gradient(135deg, var(--wave-deep) 0%, var(--wave-mid) 45%, var(--wave-light) 100%);
-		border: 1px solid rgba(26, 95, 122, 0.5);
-		box-shadow:
-			0 2px 8px rgba(26, 95, 122, 0.35),
-			inset 0 1px 0 rgba(255, 255, 255, 0.2);
+		transition: transform 0.4s var(--ease-coastal), box-shadow 0.4s var(--ease-coastal), background 0.3s ease;
+		animation: board-float 5s var(--ease-coastal) infinite 0.3s;
+		box-shadow: 0 2px 8px rgba(26, 95, 122, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.3);
 	}
 	.nav-reunion-text {
 		position: relative;
 		z-index: 2;
+		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 	}
 	.reunion-container:hover .nav-reunion {
-		box-shadow:
-			0 6px 20px rgba(26, 95, 122, 0.45),
-			inset 0 1px 0 rgba(255, 255, 255, 0.25);
-		filter: brightness(1.08);
+		box-shadow: 0 8px 24px rgba(26, 95, 122, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+		background: linear-gradient(to bottom, #b8dce8 0%, #8bc4d6 45%, #6bb5cc 50%, #8bc4d6 55%, #b8dce8 100%);
 	}
 
 	/* Sponsors nav – vintage badge / seal */
@@ -685,6 +701,11 @@ const { title, description = "Preserving and celebrating the history of Del Mar,
 		display: flex;
 		gap: 0.75rem;
 		justify-content: flex-end;
+		flex-wrap: wrap;
+	}
+	.image-change-revert {
+		background: rgba(0, 0, 0, 0.06);
+		border-color: var(--color-sepia);
 	}
 	.image-change-btn {
 		padding: 0.5rem 1rem;
@@ -710,5 +731,23 @@ const { title, description = "Preserving and celebrating the history of Del Mar,
 	}
 	body.admin-images-editable main img {
 		cursor: pointer;
+	}
+	.admin-toast {
+		position: fixed;
+		bottom: 1.5rem;
+		left: 50%;
+		transform: translateX(-50%);
+		z-index: 10001;
+		padding: 0.6rem 1.25rem;
+		background: var(--color-ink);
+		color: var(--color-cream);
+		font-size: 0.9rem;
+		font-weight: 600;
+		border-radius: 8px;
+		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+		transition: opacity 0.25s ease;
+	}
+	.admin-toast[hidden] {
+		display: none !important;
 	}
 </style>
