@@ -9,8 +9,8 @@ import Lighthouse from '../components/Lighthouse.astro';
 <BaseLayout title="Surfing Festival" description="Celebrate Del Mar's surfing heritage and the culture of the endless summer.">
 	<section class="hero hero-sunset-bg">
 		<div class="hero-content hero-entrance">
-			<h1 class="hero-title">ABOUT SURF DEL MAR:</h1>
-			<p class="tagline hero-tagline">Celebrate the waves, the culture, and the spirit of Del Mar.</p>
+			<h1 class="hero-title" data-editable="festival.hero.title">ABOUT SURF DEL MAR:</h1>
+			<p class="tagline hero-tagline" data-editable="festival.hero.tagline">Celebrate the waves, the culture, and the spirit of Del Mar.</p>
 		</div>
 	</section>
 	<div class="wave-wrap wave-hero hero-sunset-bg" id="festival-wave-wrap">
@@ -23,7 +23,7 @@ import Lighthouse from '../components/Lighthouse.astro';
 	<section class="festival-content">
 		<div class="container">
 			<article class="event-card event-card-intro">
-				<p class="festival-intro">
+				<p class="festival-intro" data-editable="festival.intro">
 					SURF DEL MAR is presented by the Del Mar Historical Society as part of its ongoing mission to preserve and celebrate the history and culture of our unique seaside community, and especially to honor the many people who have helped shape the culture and spirit of surfing over the years. At the heart of the festival is a multi-generational Surfers Reunion, bringing together people who rode Del Mar's waves in the 1950s and 60s—and even earlier— alongside today's surfers and the next generations to follow.
 				</p>
 			</article>
@@ -31,7 +31,7 @@ import Lighthouse from '../components/Lighthouse.astro';
 				<img src="/surfers-1960s.jpg" alt="Surfers carrying boards at Del Mar in the 1960s" class="festival-vintage-img" width="800" height="533" />
 				<figcaption class="festival-vintage-caption">Surfers carrying boards, Del Mar, 1960s</figcaption>
 			</figure>
-			<h2 class="festival-subhead">SURF DEL MAR brings together many aspects of surf culture in one vibrant, festive event:</h2>
+			<h2 class="festival-subhead" data-editable="festival.subhead">SURF DEL MAR brings together many aspects of surf culture in one vibrant, festive event:</h2>
 			<div class="event-cards">
 				<article class="event-card">
 					<h3>Surfers Reunion</h3>
@@ -59,13 +59,13 @@ import Lighthouse from '../components/Lighthouse.astro';
 				</article>
 			</div>
 			<article class="event-card event-card-free">
-				<p class="festival-free">
+				<p class="festival-free" data-editable="festival.free">
 					ALL EVENTS WILL BE FREE AND OPEN TO THE PUBLIC, WELCOMING RESIDENTS, VISITORS, SURFERS, FAMILIES AND ANYONE WHO SHARES A LOVE OF THE OCEAN
 				</p>
 			</article>
-			<h2 class="festival-tagline-heading">HONORING THE PAST—INSPIRING THE FUTURE</h2>
+			<h2 class="festival-tagline-heading" data-editable="festival.tagline-heading">HONORING THE PAST—INSPIRING THE FUTURE</h2>
 			<article class="event-card">
-				<p class="festival-outro">
+				<p class="festival-outro" data-editable="festival.outro">
 					By bringing together stories, art, film science and shared memories, SURF DEL MAR honors the pioneers who helped shape surf culture while inspiring future generations to care for the coast, the ocean, and the traditions that grew from them.
 				</p>
 			</article>

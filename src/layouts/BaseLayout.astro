@@ -107,10 +107,24 @@ const { title, description = "Preserving and celebrating the history of Del Mar,
 
 		<div id="admin-toast" class="admin-toast" role="status" aria-live="polite" hidden></div>
 
+		<div id="edit-text-modal" class="edit-text-modal" role="dialog" aria-labelledby="edit-text-title" aria-modal="true" hidden>
+			<div class="edit-text-overlay"></div>
+			<div class="edit-text-box">
+				<h2 id="edit-text-title" class="edit-text-title">Edit text</h2>
+				<textarea id="edit-text-field" class="edit-text-field" rows="6" placeholder="Enter text…"></textarea>
+				<div class="edit-text-actions">
+					<button type="button" class="image-change-btn image-change-no" id="edit-text-cancel">Cancel</button>
+					<button type="button" class="image-change-btn image-change-yes" id="edit-text-save">Save</button>
+				</div>
+			</div>
+		</div>
+
 		<script>
 			import { initAdminImages } from '../lib/admin-images';
+			import { initEditableText } from '../lib/admin-editable-text';
 			import { getMaintenanceMode } from '../lib/firebase';
 			initAdminImages();
+			initEditableText();
 			getMaintenanceMode().then((enabled) => {
 				if (enabled && window.location.pathname !== '/maintenance/') {
 					window.location.replace('/maintenance/');
@@ -731,6 +745,63 @@ const { title, description = "Preserving and celebrating the history of Del Mar,
 	}
 	body.admin-images-editable main img {
 		cursor: pointer;
+	}
+	.edit-text-modal {
+		position: fixed;
+		inset: 0;
+		z-index: 9999;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 1rem;
+	}
+	.edit-text-modal[hidden] {
+		display: none !important;
+	}
+	.edit-text-overlay {
+		position: absolute;
+		inset: 0;
+		background: rgba(0, 0, 0, 0.5);
+	}
+	.edit-text-box {
+		position: relative;
+		background: var(--color-cream);
+		border-radius: 12px;
+		padding: 1.5rem 1.75rem;
+		box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+		min-width: 320px;
+		max-width: 90vw;
+	}
+	.edit-text-title {
+		margin: 0 0 0.75rem 0;
+		font-size: 1.1rem;
+		font-weight: 600;
+		color: var(--color-ink);
+		font-family: var(--font-display);
+	}
+	.edit-text-field {
+		width: 100%;
+		min-height: 120px;
+		padding: 0.6rem 0.75rem;
+		font-size: 1rem;
+		font-family: inherit;
+		border: 1px solid rgba(0, 0, 0, 0.2);
+		border-radius: 8px;
+		margin-bottom: 1rem;
+		resize: vertical;
+	}
+	.edit-text-actions {
+		display: flex;
+		gap: 0.75rem;
+		justify-content: flex-end;
+	}
+	body.admin-text-editable [data-editable] {
+		cursor: text;
+		outline: 1px dashed rgba(0, 0, 0, 0.2);
+		outline-offset: 2px;
+	}
+	body.admin-text-editable [data-editable]:hover {
+		outline-color: var(--color-accent);
 	}
 	.admin-toast {
 		position: fixed;

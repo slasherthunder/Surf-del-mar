@@ -84,6 +84,19 @@ export async function getImageOverrides(): Promise<Record<string, string> | null
   }
 }
 
+/** Editable page text overrides (key → string) for admin "edit any text" feature. */
+export async function getEditableText(): Promise<Record<string, string> | null> {
+  if (!import.meta.env.PUBLIC_FIREBASE_PROJECT_ID) return null;
+  try {
+    const db = getFirestore(getFirebaseApp());
+    const snap = await getDoc(doc(db, 'content', 'pageText'));
+    const data = snap.data();
+    return (data?.text as Record<string, string>) ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export interface SharedMemory {
   id: string;
   imageUrl: string;
