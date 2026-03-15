@@ -31,6 +31,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 			<div class="reunion-col reunion-col-image">
 				<div class="reunion-poster-wrap">
 					<img src="/Poster.webp" alt="Surf Del Mar Festival poster by John Van Hamersveld" class="reunion-poster" width="600" height="900" />
+					<a href="https://www.post-future.com/" target="_blank" rel="noopener noreferrer" class="reunion-poster-btn">See more of John Van Hamersveld's work.</a>
 				</div>
 			</div>
 			<div class="reunion-col reunion-col-text">
@@ -187,8 +188,29 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
 	.reunion-poster-wrap {
 		display: flex;
+		flex-direction: column;
 		justify-content: center;
 		align-items: center;
+		gap: 1.25rem;
+	}
+
+	.reunion-poster-btn {
+		display: inline-block;
+		padding: 0.75rem 1.5rem;
+		font-family: var(--font-body);
+		font-size: 0.95rem;
+		font-weight: 700;
+		letter-spacing: 0.02em;
+		color: var(--color-cream);
+		background: var(--color-ink);
+		border-radius: 50px;
+		text-decoration: none;
+		transition: transform 0.2s ease, box-shadow 0.2s ease;
+	}
+
+	.reunion-poster-btn:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
 	}
 
 	.reunion-poster {

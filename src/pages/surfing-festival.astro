@@ -27,6 +27,10 @@ import Lighthouse from '../components/Lighthouse.astro';
 					SURF DEL MAR is presented by the Del Mar Historical Society as part of its ongoing mission to preserve and celebrate the history and culture of our unique seaside community, and especially to honor the many people who have helped shape the culture and spirit of surfing over the years. At the heart of the festival is a multi-generational Surfers Reunion, bringing together people who rode Del Mar's waves in the 1950s and 60s—and even earlier— alongside today's surfers and the next generations to follow.
 				</p>
 			</article>
+			<figure class="festival-vintage-photo">
+				<img src="/1934.png" alt="Del Mar surf history, 1934" class="festival-vintage-img" width="800" height="533" />
+				<figcaption class="festival-vintage-caption">Photo courtesy of Jim Lischer.</figcaption>
+			</figure>
 			<h2 class="festival-subhead" data-editable="festival.subhead">SURF DEL MAR brings together many aspects of surf culture in one vibrant, festive event:</h2>
 			<div class="event-cards">
 				<article class="event-card">
@@ -54,6 +58,10 @@ import Lighthouse from '../components/Lighthouse.astro';
 					<p>Climate Change Symposium exploring how surfers and coastal communities like Del Mar are responding to changing oceans and shorelines</p>
 				</article>
 			</div>
+			<figure class="festival-vintage-photo festival-photo-mardels">
+				<img src="/marsdel.JPG" alt="The Mar Dels band" class="festival-vintage-img" width="800" height="533" />
+				<figcaption class="festival-vintage-caption">The Mar Dels</figcaption>
+			</figure>
 			<article class="event-card event-card-free">
 				<p class="festival-free" data-editable="festival.free">
 					ALL EVENTS WILL BE FREE AND OPEN TO THE PUBLIC, WELCOMING RESIDENTS, VISITORS, SURFERS, FAMILIES AND ANYONE WHO SHARES A LOVE OF THE OCEAN
@@ -148,6 +156,29 @@ import Lighthouse from '../components/Lighthouse.astro';
 		color: var(--color-ink);
 		line-height: 1.75;
 		margin: 0;
+	}
+
+	.festival-vintage-photo {
+		margin: 2rem 0;
+		text-align: center;
+	}
+
+	.festival-vintage-img {
+		width: 100%;
+		max-width: 560px;
+		height: auto;
+		display: block;
+		margin: 0 auto;
+		border-radius: 8px;
+		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
+	}
+
+	.festival-vintage-caption {
+		font-family: var(--font-body);
+		font-size: 0.85rem;
+		color: var(--color-sepia);
+		margin-top: 0.5rem;
+		font-style: italic;
 	}
 
 	.festival-subhead {

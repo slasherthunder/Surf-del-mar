@@ -73,15 +73,22 @@ export function initEditableText(): void {
           value: value,
         }),
       });
-      const data = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };
+      const raw = await res.text();
+      let data: { ok?: boolean; error?: string } = {};
+      try {
+        data = JSON.parse(raw) as { ok?: boolean; error?: string };
+      } catch {
+        data = { error: res.status === 404 ? 'Function not found. Run "npx netlify dev" or deploy to Netlify.' : raw || `Save failed (${res.status}).` };
+      }
       if (res.ok && data.ok) {
         currentEl.textContent = value;
         window.showAdminToast?.('Text saved.');
       } else {
-        alert(data.error || 'Save failed.');
+        alert(data.error || `Save failed (${res.status}).`);
       }
-    } catch {
-      alert('Save failed. Check network and Netlify env.');
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      alert('Save failed: ' + msg + '. If local, run "npx netlify dev". On Netlify, set ADMIN_PASSWORD and FIREBASE_SERVICE_ACCOUNT.');
     }
     closeModal();
   });
