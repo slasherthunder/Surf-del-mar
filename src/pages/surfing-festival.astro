@@ -22,46 +22,83 @@ import Lighthouse from '../components/Lighthouse.astro';
 
 	<section class="festival-content">
 		<div class="container">
-			<article class="event-card event-card-intro">
-				<p class="festival-intro" data-editable="festival.intro">
-					SURF DEL MAR is presented by the Del Mar Historical Society as part of its ongoing mission to preserve and celebrate the history and culture of our unique seaside community, and especially to honor the many people who have helped shape the culture and spirit of surfing over the years. At the heart of the festival is a multi-generational Surfers Reunion, bringing together people who rode Del Mar's waves in the 1950s and 60s—and even earlier— alongside today's surfers and the next generations to follow.
-				</p>
-			</article>
-			<figure class="festival-vintage-photo">
-				<img src="/1934.png" alt="Del Mar surf history, 1934" class="festival-vintage-img" width="800" height="533" />
-				<figcaption class="festival-vintage-caption">Photo courtesy of Jim Lischer.</figcaption>
-			</figure>
+			<div class="photo-layout-split">
+				<article class="event-card event-card-intro">
+					<p class="festival-intro" data-editable="festival.intro">
+						SURF DEL MAR is presented by the Del Mar Historical Society as part of its ongoing mission to preserve and celebrate the history and culture of our unique seaside community, and especially to honor the many people who have helped shape the culture and spirit of surfing over the years. At the heart of the festival is a multi-generational Surfers Reunion, bringing together people who rode Del Mar's waves in the 1950s and 60s—and even earlier— alongside today's surfers and the next generations to follow.
+					</p>
+				</article>
+				<figure class="festival-vintage-photo photo-angled-right">
+					<div class="photo-frame">
+						<img src="/1934.png" alt="Del Mar surf history, 1934" class="festival-vintage-img" width="800" height="533" />
+						<div class="tape-element"></div>
+					</div>
+					<figcaption class="festival-vintage-caption">Photo courtesy of Jim Lischer.</figcaption>
+				</figure>
+			</div>
 			<h2 class="festival-subhead" data-editable="festival.subhead">SURF DEL MAR brings together many aspects of surf culture in one vibrant, festive event:</h2>
 			<div class="event-cards">
-				<article class="event-card">
-					<h3>Surfers Reunion</h3>
-					<p>Celebrating decades of Del Mar surf history</p>
+				<article class="event-card event-card-vintage">
+					<div class="event-card-photo">
+						<div class="photo-frame photo-frame-with-caption">
+							<img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='267' viewBox='0 0 400 267'%3E%3Crect fill='%23e0d8ce' width='400' height='267'/%3E%3Ctext x='200' y='134' text-anchor='middle' dominant-baseline='middle' font-family='sans-serif' font-size='14' fill='%238b7355'%3EPhoto coming soon%3C/text%3E%3C/svg%3E" alt="" class="festival-vintage-img" width="400" height="267" data-original-src="/festival/event-surfers-reunion.jpg" />
+							<p class="event-card-photo-caption" data-editable="festival.events.surfers-reunion.caption"></p>
+						</div>
+					</div>
+					<h3 data-editable="festival.events.surfers-reunion.title">Surfers Reunion</h3>
+					<p data-editable="festival.events.surfers-reunion.description">Celebrating decades of Del Mar surf history</p>
 				</article>
-				<article class="event-card">
-					<h3>Concerts</h3>
-					<p>With the MarDels and Peter Sprague</p>
+				<article class="event-card event-card-vintage">
+					<div class="event-card-photo">
+						<div class="photo-frame photo-frame-with-caption">
+							<img src="/marsdel.JPG" alt="The Mar Dels band" class="festival-vintage-img" width="400" height="267" data-original-src="/festival/event-concerts.jpg" />
+							<p class="event-card-photo-caption" data-editable="festival.events.concerts.caption">The Mars Del</p>
+						</div>
+					</div>
+					<h3 data-editable="festival.events.concerts.title">Concerts</h3>
+					<p data-editable="festival.events.concerts.description">With the MarDels and Peter Sprague</p>
 				</article>
-				<article class="event-card">
-					<h3>Film Festival</h3>
-					<p>Showcasing the classic Endless Summer and the debut of a Jim Lischer film on Del Mar surfers over the years</p>
+				<article class="event-card event-card-vintage">
+					<div class="event-card-photo">
+						<div class="photo-frame photo-frame-with-caption">
+							<img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='267' viewBox='0 0 400 267'%3E%3Crect fill='%23e0d8ce' width='400' height='267'/%3E%3Ctext x='200' y='134' text-anchor='middle' dominant-baseline='middle' font-family='sans-serif' font-size='14' fill='%238b7355'%3EPhoto coming soon%3C/text%3E%3C/svg%3E" alt="" class="festival-vintage-img" width="400" height="267" data-original-src="/festival/event-film-festival.jpg" />
+							<p class="event-card-photo-caption" data-editable="festival.events.film-festival.caption"></p>
+						</div>
+					</div>
+					<h3 data-editable="festival.events.film-festival.title">Film Festival</h3>
+					<p data-editable="festival.events.film-festival.description">Showcasing the classic Endless Summer and the debut of a Jim Lischer film on Del Mar surfers over the years</p>
 				</article>
-				<article class="event-card">
-					<h3>Surfwriter's Book Fair</h3>
-					<p>Featuring authors and publications dedicated to surfing</p>
+				<article class="event-card event-card-vintage">
+					<div class="event-card-photo">
+						<div class="photo-frame photo-frame-with-caption">
+							<img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='267' viewBox='0 0 400 267'%3E%3Crect fill='%23e0d8ce' width='400' height='267'/%3E%3Ctext x='200' y='134' text-anchor='middle' dominant-baseline='middle' font-family='sans-serif' font-size='14' fill='%238b7355'%3EPhoto coming soon%3C/text%3E%3C/svg%3E" alt="" class="festival-vintage-img" width="400" height="267" data-original-src="/festival/event-book-fair.jpg" />
+							<p class="event-card-photo-caption" data-editable="festival.events.book-fair.caption"></p>
+						</div>
+					</div>
+					<h3 data-editable="festival.events.book-fair.title">Surfwriter's Book Fair</h3>
+					<p data-editable="festival.events.book-fair.description">Featuring authors and publications dedicated to surfing</p>
 				</article>
-				<article class="event-card">
-					<h3>Art Walk</h3>
-					<p>Highlighting local artists and student artwork from Del Mar schools</p>
+				<article class="event-card event-card-vintage">
+					<div class="event-card-photo">
+						<div class="photo-frame photo-frame-with-caption">
+							<img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='267' viewBox='0 0 400 267'%3E%3Crect fill='%23e0d8ce' width='400' height='267'/%3E%3Ctext x='200' y='134' text-anchor='middle' dominant-baseline='middle' font-family='sans-serif' font-size='14' fill='%238b7355'%3EPhoto coming soon%3C/text%3E%3C/svg%3E" alt="" class="festival-vintage-img" width="400" height="267" data-original-src="/festival/event-art-walk.jpg" />
+							<p class="event-card-photo-caption" data-editable="festival.events.art-walk.caption"></p>
+						</div>
+					</div>
+					<h3 data-editable="festival.events.art-walk.title">Art Walk</h3>
+					<p data-editable="festival.events.art-walk.description">Highlighting local artists and student artwork from Del Mar schools</p>
 				</article>
-				<article class="event-card event-card-advocacy">
-					<h3>Surfing and Sustainability</h3>
-					<p>Climate Change Symposium exploring how surfers and coastal communities like Del Mar are responding to changing oceans and shorelines</p>
+				<article class="event-card event-card-vintage event-card-advocacy">
+					<div class="event-card-photo">
+						<div class="photo-frame photo-frame-with-caption">
+							<img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='267' viewBox='0 0 400 267'%3E%3Crect fill='%23e0d8ce' width='400' height='267'/%3E%3Ctext x='200' y='134' text-anchor='middle' dominant-baseline='middle' font-family='sans-serif' font-size='14' fill='%238b7355'%3EPhoto coming soon%3C/text%3E%3C/svg%3E" alt="" class="festival-vintage-img" width="400" height="267" data-original-src="/festival/event-sustainability.jpg" />
+							<p class="event-card-photo-caption" data-editable="festival.events.sustainability.caption"></p>
+						</div>
+					</div>
+					<h3 data-editable="festival.events.sustainability.title">Surfing and Sustainability</h3>
+					<p data-editable="festival.events.sustainability.description">Climate Change Symposium exploring how surfers and coastal communities like Del Mar are responding to changing oceans and shorelines</p>
 				</article>
 			</div>
-			<figure class="festival-vintage-photo festival-photo-mardels">
-				<img src="/marsdel.JPG" alt="The Mar Dels band" class="festival-vintage-img" width="800" height="533" />
-				<figcaption class="festival-vintage-caption">The Mar Dels</figcaption>
-			</figure>
 			<article class="event-card event-card-free">
 				<p class="festival-free" data-editable="festival.free">
 					ALL EVENTS WILL BE FREE AND OPEN TO THE PUBLIC, WELCOMING RESIDENTS, VISITORS, SURFERS, FAMILIES AND ANYONE WHO SHARES A LOVE OF THE OCEAN
@@ -78,6 +115,8 @@ import Lighthouse from '../components/Lighthouse.astro';
 </BaseLayout>
 
 <style>
+	@import url('https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&display=swap');
+
 	.hero {
 		color: var(--color-cream);
 		padding: 4rem 2rem;
@@ -146,31 +185,86 @@ import Lighthouse from '../components/Lighthouse.astro';
 	}
 
 	.festival-content .container {
-		max-width: 820px;
+		display: flex;
+		flex-direction: column;
+		max-width: 960px;
 		margin: 0 auto;
 	}
 
 	.festival-intro {
 		font-family: var(--font-body);
-		font-size: 1.0625rem;
+		font-size: 1.125rem;
 		color: var(--color-ink);
-		line-height: 1.75;
+		line-height: 1.9;
 		margin: 0;
 	}
 
-	.festival-vintage-photo {
-		margin: 2rem 0;
-		text-align: center;
+	/* Container for the split layout: photo left, text right on desktop */
+	.photo-layout-split {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 2rem;
+		align-items: start;
+		margin-bottom: 3rem;
+	}
+
+	@media (min-width: 768px) {
+		.photo-layout-split {
+			grid-template-columns: 0.85fr 1.15fr;
+		}
+		.photo-layout-split .photo-angled-right {
+			order: 1;
+		}
+		.photo-layout-split .event-card-intro {
+			order: 2;
+		}
+	}
+
+	/* The Photo Frame Effect */
+	.photo-frame {
+		position: relative;
+		display: inline-block;
+		padding: 10px;
+		background: #fff;
+		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+		border-radius: 2px;
+	}
+
+	.photo-frame-with-caption {
+		display: flex;
+		flex-direction: column;
+		padding-bottom: 1.25rem;
 	}
 
 	.festival-vintage-img {
 		width: 100%;
-		max-width: 560px;
 		height: auto;
 		display: block;
-		margin: 0 auto;
-		border-radius: 8px;
-		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
+		border: 1px solid rgba(0, 0, 0, 0.05);
+	}
+
+	/* Organic "Taped" Effect */
+	.tape-element {
+		position: absolute;
+		top: -15px;
+		left: 50%;
+		transform: translateX(-50%) rotate(-2deg);
+		width: 100px;
+		height: 30px;
+		background: rgba(255, 255, 255, 0.4);
+		backdrop-filter: blur(2px);
+		box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+		z-index: 2;
+	}
+
+	/* Subtle Rotations */
+	.photo-angled-right {
+		transform: rotate(2deg);
+		transition: transform 0.4s ease;
+	}
+
+	.photo-angled-right:hover {
+		transform: rotate(0deg) scale(1.02);
 	}
 
 	.festival-vintage-caption {
@@ -179,6 +273,30 @@ import Lighthouse from '../components/Lighthouse.astro';
 		color: var(--color-sepia);
 		margin-top: 0.5rem;
 		font-style: italic;
+	}
+
+	/* Polaroid Style for the Band */
+	.photo-polaroid {
+		max-width: 500px;
+		margin: 3rem auto;
+		padding: 15px 15px 40px 15px;
+		background: #fff;
+		transform: rotate(-1.5deg);
+		box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+	}
+
+	.photo-polaroid .photo-frame {
+		padding: 0;
+		box-shadow: none;
+		background: transparent;
+	}
+
+	.photo-polaroid .festival-vintage-caption {
+		font-family: "Kalam", cursive, sans-serif;
+		font-size: 1.1rem;
+		color: #444;
+		margin-top: 15px;
+		font-style: normal;
 	}
 
 	.festival-subhead {
@@ -193,8 +311,8 @@ import Lighthouse from '../components/Lighthouse.astro';
 	.event-cards {
 		display: grid;
 		grid-template-columns: 1fr;
-		gap: 1.25rem;
-		margin-bottom: 1.5rem;
+		gap: 2.5rem;
+		margin-bottom: 2rem;
 	}
 
 	@media (min-width: 640px) {
@@ -205,7 +323,7 @@ import Lighthouse from '../components/Lighthouse.astro';
 
 	@media (min-width: 900px) {
 		.event-cards {
-			gap: 1.5rem;
+			gap: 2rem;
 		}
 	}
 
@@ -221,13 +339,78 @@ import Lighthouse from '../components/Lighthouse.astro';
 		transition: transform 0.3s ease, box-shadow 0.3s ease;
 	}
 
+	.event-card-vintage {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+		padding: 1.5rem 1.25rem 1.75rem;
+		border-left-width: 6px;
+		overflow: visible;
+	}
+
+	.event-card-vintage .event-card-photo {
+		width: 100%;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		margin-bottom: 1.25rem;
+	}
+
+	.event-card-photo-caption {
+		font-family: var(--font-body);
+		font-size: 0.85rem;
+		color: var(--color-sepia);
+		font-style: italic;
+		margin: 0.75rem 0 0;
+		text-align: center;
+		min-height: 1.25em;
+	}
+
+	:global(body.admin-text-editable) .event-card-photo-caption:empty::before {
+		content: 'Add caption…';
+		color: var(--color-sepia);
+		opacity: 0.7;
+	}
+
+	.event-card-vintage .photo-frame {
+		width: 100%;
+		max-width: 400px;
+	}
+
+	.event-card-vintage .festival-vintage-img {
+		width: 100%;
+		height: auto;
+		aspect-ratio: 3 / 2;
+		object-fit: cover;
+	}
+
+	.event-card-vintage h3 {
+		margin: 0 1rem 0.6rem;
+		font-size: 1.3rem;
+	}
+
+	.event-card-vintage p {
+		margin: 0 1rem 1.25rem;
+		padding: 0;
+		font-size: 1.05rem;
+		line-height: 1.65;
+	}
+
 	.event-card:hover {
 		transform: translateX(10px);
 		box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
 	}
 
+	.event-card-vintage:hover {
+		transform: translateY(-4px);
+		box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+	}
+
 	.event-card-intro {
 		margin-bottom: 1.5rem;
+		padding: 1.75rem 1.5rem;
 	}
 
 	.event-card h3 {

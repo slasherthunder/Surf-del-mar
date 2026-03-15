@@ -78,7 +78,12 @@ export function initEditableText(): void {
       try {
         data = JSON.parse(raw) as { ok?: boolean; error?: string };
       } catch {
-        data = { error: res.status === 404 ? 'Function not found. Run "npx netlify dev" or deploy to Netlify.' : raw || `Save failed (${res.status}).` };
+        data = {
+          error:
+            res.status === 404
+              ? 'Save function not available. Locally: run "npx netlify dev" (not "npm run dev") so Netlify functions run. On production: ensure the site is deployed to Netlify.'
+              : raw || `Save failed (${res.status}).`,
+        };
       }
       if (res.ok && data.ok) {
         currentEl.textContent = value;
