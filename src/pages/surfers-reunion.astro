@@ -404,7 +404,7 @@ import Lighthouse from '../components/Lighthouse.astro';
 		position: relative;
 		z-index: 1;
 		padding: 4rem 2rem;
-		background: linear-gradient(180deg, #e8e0d6 0%, #ddd4c8 100%);
+		background: linear-gradient(180deg, var(--color-sand) 0%, var(--color-foam) 100%);
 		box-shadow: inset 0 1px 0 rgba(255,255,255,0.4);
 	}
 
@@ -512,14 +512,14 @@ import Lighthouse from '../components/Lighthouse.astro';
 	}
 
 	.event-card {
-		background: rgba(255, 255, 255, 0.4);
+		background: rgba(184, 220, 228, 0.5);
 		backdrop-filter: blur(10px);
 		-webkit-backdrop-filter: blur(10px);
 		padding: 1.5rem 1.5rem 1.5rem 1.25rem;
 		border-radius: 12px;
 		border: 1px solid rgba(255, 255, 255, 0.5);
 		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-		border-left: 6px solid #8b7355;
+		border-left: 6px solid var(--color-accent);
 		transition: transform 0.3s ease, box-shadow 0.3s ease;
 		margin-bottom: 1.25rem;
 	}
@@ -765,7 +765,7 @@ import Lighthouse from '../components/Lighthouse.astro';
 		width: 72px;
 		height: 72px;
 		border-radius: 50%;
-		background: #fff;
+		background: var(--color-foam);
 		border: none;
 		box-shadow: 0 6px 20px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08);
 		font-size: 2.5rem;
@@ -931,7 +931,7 @@ import Lighthouse from '../components/Lighthouse.astro';
 		padding: 0.5rem 0.75rem;
 		border: 1px solid var(--color-sand-dark);
 		border-radius: 6px;
-		background: #fff;
+		background: var(--color-foam);
 	}
 
 	.share-memories-textarea {
@@ -987,5 +987,35 @@ import Lighthouse from '../components/Lighthouse.astro';
 	.share-memories-submit:disabled {
 		opacity: 0.7;
 		cursor: not-allowed;
+	}
+
+	@media (max-width: 768px) {
+		.hero {
+			padding: 3rem 1rem;
+		}
+		.hero .hero-title {
+			font-size: clamp(1.75rem, 6vw, 2.25rem);
+		}
+		.reunion-content {
+			padding: 2.5rem 1rem;
+		}
+		.reunion-intro-grid {
+			gap: 1.5rem;
+		}
+		.reunion-surfers-img {
+			max-width: 100%;
+		}
+		.memories-section {
+			padding: 2rem 1rem;
+		}
+		.share-memories-form input,
+		.share-memories-form textarea {
+			min-height: 48px;
+		}
+		.share-memories-cancel,
+		.share-memories-submit {
+			min-height: 48px;
+			padding: 0.85rem 1.25rem;
+		}
 	}
 </style>

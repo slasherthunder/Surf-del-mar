@@ -101,6 +101,33 @@ import RevealOnScroll from '../components/RevealOnScroll.astro';
 		box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
 	}
 
+	@media (max-width: 768px) {
+		.hero {
+			padding: 3rem 1rem;
+		}
+		.hero h1 {
+			font-size: clamp(1.75rem, 6vw, 2.25rem);
+		}
+		.tagline {
+			font-size: 1.1rem;
+		}
+		.content-section {
+			padding: 2.5rem 1rem;
+		}
+		.content-section h2 {
+			font-size: 1.5rem;
+		}
+		.content-section p {
+			font-size: 1rem;
+		}
+		.cta-group {
+			margin-top: 1.5rem;
+		}
+		.btn {
+			min-height: 48px;
+		}
+	}
+
 	.content-section h2 {
 		font-family: var(--font-display);
 		font-size: 1.75rem;

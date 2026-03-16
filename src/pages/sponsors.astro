@@ -69,7 +69,7 @@ import Lighthouse from '../components/Lighthouse.astro';
 		position: relative;
 		z-index: 1;
 		padding: 4rem 2rem;
-		background: linear-gradient(180deg, #e8e0d6 0%, #ddd4c8 100%);
+		background: linear-gradient(180deg, var(--color-sand) 0%, var(--color-foam) 100%);
 		box-shadow: inset 0 1px 0 rgba(255,255,255,0.4);
 	}
 
@@ -130,5 +130,28 @@ import Lighthouse from '../components/Lighthouse.astro';
 	.btn-primary:hover {
 		transform: translateY(-1px);
 		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+	}
+
+	@media (max-width: 768px) {
+		.hero {
+			padding: 3rem 1rem;
+		}
+		.hero-title {
+			font-size: clamp(1.5rem, 6vw, 2rem);
+		}
+		.sponsors-content {
+			padding: 2.5rem 1rem;
+		}
+		.sponsors-intro {
+			font-size: 1rem;
+		}
+		.sponsor-logo-ogr {
+			max-width: 280px;
+			max-height: 110px;
+		}
+		.btn {
+			min-height: 48px;
+			padding: 0.85rem 1.5rem;
+		}
 	}
 </style>
