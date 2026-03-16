@@ -90,13 +90,36 @@ const { title, description = "Preserving and celebrating the history of Del Mar,
 			<div class="nav-drawer" id="nav-drawer" aria-hidden="true">
 				<div class="nav-drawer-backdrop" id="nav-drawer-backdrop"></div>
 				<div class="nav-drawer-panel">
-					<ul class="nav-drawer-list">
-						<li><a href="/">Home</a></li>
-						<li><a href="/surfing-festival/">About Surf Del Mar</a></li>
-						<li><a href="/surfers-reunion/">Surfers Reunion</a></li>
-						<li><a href="/schedule/">Schedule</a></li>
-						<li><a href="/sponsors/">Sponsors</a></li>
-					</ul>
+					<div class="nav-drawer-nav">
+						<div class="tower-container">
+							<a href="/" class="nav-tower"><span class="nav-tower-text">Home</span></a>
+						</div>
+						<div class="surf-container">
+							<a href="/surfing-festival/" class="nav-surfboard"><span class="nav-surfboard-text">About Surf Del Mar</span></a>
+						</div>
+						<div class="reunion-container">
+							<a href="/surfers-reunion/" class="nav-reunion"><span class="nav-reunion-text">Surfers Reunion</span></a>
+						</div>
+						<div class="schedule-container">
+							<a href="/schedule/" class="nav-schedule">
+								<span class="nav-schedule-paper">
+									<span class="nav-schedule-icon" aria-hidden="true">
+										<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" focusable="false">
+											<path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/>
+											<path d="m9 16 2 2 4-4"/>
+										</svg>
+									</span>
+									<span class="nav-schedule-text">Schedule</span>
+								</span>
+							</a>
+						</div>
+						<div class="sponsors-container">
+							<a href="/sponsors/" class="nav-sponsors">
+								<span class="nav-sponsors-star" aria-hidden="true">★</span>
+								<span class="nav-sponsors-text">Sponsors</span>
+							</a>
+						</div>
+					</div>
 					<div class="nav-drawer-admin">
 						<AdminLoginButton />
 					</div>
@@ -433,8 +456,8 @@ const { title, description = "Preserving and celebrating the history of Del Mar,
 		position: absolute;
 		top: 0;
 		right: 0;
-		width: 280px;
-		max-width: 85vw;
+		width: 320px;
+		max-width: 90vw;
 		height: 100%;
 		background: var(--color-sand-dark);
 		color: var(--color-cream);
@@ -443,34 +466,45 @@ const { title, description = "Preserving and celebrating the history of Del Mar,
 		transition: transform 0.25s ease;
 		display: flex;
 		flex-direction: column;
-		padding: 4rem 1.5rem 2rem;
+		padding: 4rem 1rem 2rem;
+		overflow-y: auto;
 	}
 	.nav-drawer-open .nav-drawer-panel {
 		transform: translateX(0);
 	}
-	.nav-drawer-list {
-		list-style: none;
-		margin: 0;
-		padding: 0;
+	.nav-drawer-nav {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 1rem;
 	}
-	.nav-drawer-list li {
-		margin: 0;
+	.nav-drawer-nav .tower-container,
+	.nav-drawer-nav .surf-container,
+	.nav-drawer-nav .reunion-container,
+	.nav-drawer-nav .schedule-container,
+	.nav-drawer-nav .sponsors-container {
+		width: 100%;
+		max-width: 260px;
+		display: flex;
+		justify-content: center;
 	}
-	.nav-drawer-list a {
-		display: block;
-		padding: 0.85rem 0;
-		font-size: 1.1rem;
-		font-weight: 600;
-		color: inherit;
-		text-decoration: none;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+	.nav-drawer-nav .nav-tower,
+	.nav-drawer-nav .nav-surfboard,
+	.nav-drawer-nav .nav-reunion,
+	.nav-drawer-nav .nav-sponsors {
+		width: 100%;
+		justify-content: center;
+		text-align: center;
 	}
-	.nav-drawer-list a:hover {
-		opacity: 0.9;
+	.nav-drawer-nav .nav-schedule-paper {
+		width: 100%;
+		min-width: 0;
+		justify-content: center;
 	}
 	.nav-drawer-admin {
 		margin-top: auto;
 		padding-top: 1.5rem;
+		border-top: 1px solid rgba(255, 255, 255, 0.2);
 	}
 	body.nav-drawer-body-open {
 		overflow: hidden;
