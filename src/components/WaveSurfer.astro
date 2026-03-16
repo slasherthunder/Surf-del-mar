@@ -318,4 +318,34 @@
 		overflow: hidden;
 		opacity: 0;
 	}
+
+	@media (max-width: 768px) {
+		.surfer {
+			width: 26px;
+			height: 22px;
+			left: 2%;
+			bottom: 48%;
+		}
+		@keyframes surfer-bob {
+			0%, 100% { transform: translateY(0); }
+			50% { transform: translateY(-3px); }
+		}
+		.surfer:hover:not(.surfing) {
+			animation-duration: 2s;
+		}
+		.surfer.surf-v1 { --surf-duration: 2s; }
+		.surfer.surf-v2 { --surf-duration: 1.6s; }
+		.surfer.surf-v3 { --surf-duration: 1.5s; }
+		.surfer.surf-v4 { --surf-duration: 2.5s; }
+	}
+	@media (max-width: 768px) {
+		.wave-surfer-wrap.surf-finish {
+			animation: finish-shake-mobile 0.35s ease-out;
+		}
+		@keyframes finish-shake-mobile {
+			0%, 100% { transform: translateX(0) translateY(0); }
+			25% { transform: translateX(-1px) translateY(0); }
+			75% { transform: translateX(1px) translateY(0); }
+		}
+	}
 </style>

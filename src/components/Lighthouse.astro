@@ -350,38 +350,80 @@ const { toggleTargetId } = Astro.props;
 		max-width: 12ch;
 	}
 
-	/* ===== Responsive ===== */
-	@media (max-width: 640px) {
+	/* ===== Responsive: mobile-friendly sizing and calmer animations ===== */
+	@media (max-width: 768px) {
 		.lighthouse-wrap {
-			width: 130px;
-			height: 110px;
+			width: 140px;
+			height: 100px;
 		}
 		.lighthouse-rock {
-			width: 130px;
-			height: 50px;
+			width: 140px;
+			height: 48px;
 		}
 		.lighthouse {
-			width: 40px;
-			height: 60px;
-			right: 32px;
-			bottom: 38px;
+			width: 42px;
+			height: 58px;
+			right: 28px;
+			bottom: 34px;
+		}
+		.lighthouse:hover {
+			transform: scale(1.05);
 		}
 		.beam {
-			bottom: 62px;
+			bottom: 56px;
+			left: 50%;
+		}
+		.lighthouse.shining .beam {
+			animation: beam-entrance 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards, beam-sweep-mobile 10s 0.4s ease-in-out infinite;
+		}
+		@keyframes beam-sweep-mobile {
+			0%, 100% { transform: translateX(-50%) rotate(-5deg); }
+			50% { transform: translateX(-50%) rotate(5deg); }
 		}
 		.beam-light {
-			width: 80px;
-			height: 110px;
+			width: 70px;
+			height: 95px;
 		}
 		.beam-circle {
-			width: clamp(80px, 20vw, 100px);
-			height: clamp(80px, 20vw, 100px);
-			padding: 0.65rem 0.85rem;
+			width: clamp(72px, 18vw, 88px);
+			height: clamp(72px, 18vw, 88px);
+			padding: 0.5rem 0.65rem;
 		}
 		.location-text {
-			font-size: 0.78rem;
-			line-height: 1.4;
-			max-width: none;
+			font-size: 0.72rem;
+			line-height: 1.35;
+			max-width: 10ch;
+		}
+	}
+	@media (max-width: 480px) {
+		.lighthouse-wrap {
+			width: 115px;
+			height: 88px;
+		}
+		.lighthouse-rock {
+			width: 115px;
+			height: 42px;
+		}
+		.lighthouse {
+			width: 36px;
+			height: 50px;
+			right: 20px;
+			bottom: 30px;
+		}
+		.beam {
+			bottom: 48px;
+		}
+		.beam-light {
+			width: 58px;
+			height: 78px;
+		}
+		.beam-circle {
+			width: 64px;
+			height: 64px;
+			padding: 0.4rem 0.5rem;
+		}
+		.location-text {
+			font-size: 0.65rem;
 		}
 	}
 </style>

@@ -442,25 +442,45 @@
 		100% { transform: translate3d(0, 0, 0) rotate(0deg); }
 	}
 
-	@media (max-width: 640px) {
+	@media (max-width: 768px) {
 		.pirate-ship {
-			width: 50px;
-			height: 25px;
-			left: 40px;
-			transform-origin: 25px 25px 0;
+			width: 44px;
+			height: 22px;
+			left: 20px;
+			bottom: 38%;
+			transform-origin: 22px 22px 0;
+			animation: ship-tilt-mobile 10s ease-in-out infinite;
+		}
+		@keyframes ship-tilt-mobile {
+			0%, 100% { transform: rotate(-3deg); }
+			50% { transform: rotate(3deg); }
 		}
 		:global(.fog-mode) .pirate-ship {
-			animation: grand-voyage 35s cubic-bezier(0.45, 0.05, 0.55, 0.95) forwards;
+			animation: grand-voyage-mobile 28s cubic-bezier(0.45, 0.05, 0.55, 0.95) forwards;
 		}
 		:global(.fog-mode) .pirate-ship .sails {
-			animation: sail-direction 35s cubic-bezier(0.45, 0.05, 0.55, 0.95) forwards;
+			animation: sail-direction 28s cubic-bezier(0.45, 0.05, 0.55, 0.95) forwards;
 		}
-		@keyframes grand-voyage {
-			0% { transform: translate3d(0, 0, 0); }
-			45% { transform: translate3d(calc(100vw - 320px), 0, 0) rotate(10deg); }
-			85% { transform: translate3d(0, 0, 0) rotate(-5deg); }
-			92% { transform: translate3d(0, -20px, 0) rotate(5deg); }
+		@keyframes grand-voyage-mobile {
+			0% { transform: translate3d(0, 0, 0) rotate(0deg); }
+			42% { transform: translate3d(calc(100vw - 100px), 0, 0) rotate(8deg); }
+			82% { transform: translate3d(0, 0, 0) rotate(-4deg); }
+			90% { transform: translate3d(0, -12px, 0) rotate(4deg); }
 			100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+		}
+		.fog-overlay {
+			animation: drift 30s ease-in-out infinite;
+		}
+		:global(.fog-mode) .fog-overlay {
+			animation: fog-voyage-mobile 28s cubic-bezier(0.45, 0.05, 0.55, 0.95) forwards;
+		}
+		@keyframes fog-voyage-mobile {
+			0% { opacity: 0; backdrop-filter: blur(0); -webkit-backdrop-filter: blur(0); }
+			12% { opacity: 0.7; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+			30% { opacity: 1; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+			70% { opacity: 1; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+			88% { opacity: 0.5; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+			100% { opacity: 0; backdrop-filter: blur(0); -webkit-backdrop-filter: blur(0); }
 		}
 	}
 </style>
